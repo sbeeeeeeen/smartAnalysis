@@ -1,0 +1,32 @@
+package kr.or.ddit.cooperative.service;
+
+import java.util.List;
+
+import kr.or.ddit.cooperative.model.CooperativeVo;
+
+public interface CooperativeServiceInf {
+
+	/**
+	* Method : getCooperativeList
+	* 최초작성일 : 2018. 9. 4.
+	* 작성자 : user
+	* 변경이력 :
+	* @param cship_num
+	* @return
+	* Method 설명 : 협동조합원 조회
+	*/
+	public List<CooperativeVo> getCooperativeList(int cship_num);
+
+	/**
+	* Method : deleteCooperative
+	* 최초작성일 : 2018. 9. 10.
+	* 작성자 : user
+	* 변경이력 :
+	* @param id
+	* @return
+	* Method 설명 : 협동조합원 강퇴
+	*/
+	public int deleteCooperative(int coop_num);
+
+	public int insertCooperative(CooperativeVo cooperativeVo);
+}

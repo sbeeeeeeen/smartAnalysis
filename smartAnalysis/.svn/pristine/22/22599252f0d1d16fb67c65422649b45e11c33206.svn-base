@@ -1,0 +1,35 @@
+package kr.or.ddit.facility.model;
+
+public class FacilityVo {
+	private int faci_num;
+	private String faci_nm;
+	private int faci_cnt;
+	private int reg_code;
+	
+	public int getFaci_num() {
+		return faci_num;
+	}
+	public void setFaci_num(int faci_num) {
+		this.faci_num = faci_num;
+	}
+	public String getFaci_nm() {
+		return faci_nm;
+	}
+	public void setFaci_nm(String faci_nm) {
+		this.faci_nm = faci_nm;
+	}
+	public int getFaci_cnt() {
+		return faci_cnt;
+	}
+	public void setFaci_cnt(int faci_cnt) {
+		this.faci_cnt = faci_cnt;
+	}
+	public int getReg_code() {
+		return reg_code;
+	}
+	public void setReg_code(int reg_code) {
+		this.reg_code = reg_code;
+	}
+	
+	
+}

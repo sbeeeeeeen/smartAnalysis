@@ -1,0 +1,138 @@
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+	pageEncoding="EUC-KR"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<script src="/Moderna/js/jquery.js"></script>
+<title>Insert title here</title>
+<script>
+	function callAjax() {
+		var key = "6682823005424844847";
+		var target = "";
+		var keyword = $("#keyword").val();
+		var from = "";
+		var to = "";
+		var timeunit = "";
+		$
+				.ajax({
+					url : "http://api.datamixi.com/datamixiApi/topictrend?key"
+							+ key
+							+ "=&target=blog&keyword=삼성&from=20171101&to=20180201&timeunit=month",
+					success : function(data) {
+						console.log(data.return_object.trends[0].nodes[0]);
+
+						for (var i = 0; i < data.return_object.trends.length; i++) {
+							for (j = 0; j < data.return_object.trends[i].nodes.length; j++) {
+								document.body.innerHTML += data.return_object.trends[i].nodes[j].id
+										+ "위 : "
+										+ data.return_object.trends[i].nodes[j].name
+										+ "<br>"
+										+ data.return_object.trends[i].nodes[j].weight
+										+ "<br>";
+							}
+						}
+					}
+				});
+	}
+</script>
+</head>
+
+<body>
+	<!-- container -->
+	<div class="container ng-scope">
+
+		<div class="page-header">
+			<h2>snsMain</h2>
+		</div>
+
+		<!-- 작은 탭 -->
+		<div class="container mt-3">
+			<div class="col-5"></div>
+		</div>
+
+		<div id="area" class="w3-container rank">
+			<div class="selectwrap">
+				<div class="col-1 col-offset-3 text-right">
+					<h5>1</h5>
+				</div>
+
+				<form id="frm" role="form" name="frm" method="post">
+					<div class="col-1 ng-scope"></div>
+
+					<div class="col-1 ng-scope"></div>
+
+					<!-- 현황보기 -->
+					<div class="col-4 text-left">
+						&nbsp;&nbsp;&nbsp; <input type="text" id="keyword" name="keyword">
+						<input type="button" name="snsBtn" value="분석"
+							onclick="callAjax();">
+					</div>
+
+				</form>
+				<div class="snswrap">
+					<form class="form-inline text-center">
+						<ul class="snslist">
+							<li><label class="control checkbox"> <input
+									type="checkbox" class="add-contrast" data-role="collar"
+									value="all" checked=""> <span class="control-indicator"></span>전체
+							</label></li>
+
+							<li><label class="control checkbox"> <input
+									type="checkbox" class="add-contrast" data-role="collar"
+									value="twitter" checked=""> <span
+									class="control-indicator"></span>트위터
+							</label></li>
+
+							<li><label class="control checkbox"> <input
+									type="checkbox" class="add-contrast" data-role="collar"
+									value="blog" checked=""> <span
+									class="control-indicator"></span>블로그
+							</label></li>
+
+						</ul>
+						<div class="input-group">
+							<!-- 검색시작일 -->
+							<label for="startdate" class="sr-only">검색시작일</label> <input
+								type="text"
+								class="form-control input-ss datepicker hasDatepicker"
+								placeholder="2016-09-01" id="startdate" readonly="readonly"
+								unselectable="on"><img class="ui-datepicker-trigger"
+								src="/sbiz/resources/images/common/btn_cal.png" alt="" title="">
+							<!-- <span class="input-group-btn ui-datepicker-trigger">
+					<a class="btn btn-grey" href="javascript:void(0);"><i class="fa fa-calendar" aria-hidden="true"></i></a>
+				</span> -->
+						</div>
+						<span>~</span>
+						<!-- /검색시작일 -->
+
+						<div class="input-group">
+							<!-- 검색종료일 -->
+							<label for="enddate" class="sr-only">검색종료일</label> <input
+								type="text"
+								class="form-control input-ss datepicker hasDatepicker"
+								placeholder="2016-09-07" id="enddate" readonly="readonly"
+								unselectable="on"><img class="ui-datepicker-trigger"
+								src="/sbiz/resources/images/common/btn_cal.png" alt="" title="">
+							<!-- <span class="input-group-btn ui-datepicker-trigger">
+					<a class="btn btn-grey" href="javascript:void(0);"><i class="fa fa-calendar" aria-hidden="true"></i></a>
+				</span> -->
+						</div>
+						<!-- /검색종료일 -->
+						&nbsp;&nbsp;&nbsp;
+
+						<div class="btn-group date_pick" role="group" aria-label="...">
+							<a href="javascript:void(0);" id="w1" class="btn btn-secondary">1주</a>
+							<a href="javascript:void(0);" id="m1" class="btn">1개월</a> <a
+								href="javascript:void(0);" id="m3" class="btn">3개월</a>
+						</div>
+						&nbsp;&nbsp;&nbsp; <a class="btn btn-primary"
+							id="recognition_search">조회</a>
+					</form>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

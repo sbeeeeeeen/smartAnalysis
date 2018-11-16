@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="openclose">
+  	<select id="getOpenCloseGuList" parameterType="map" resultType="open_closeVo">
+  		SELECT o.opcl_num, o.opcl_sop, o.opcl_scl, o.opcl_hop, o.opcl_hcl, i.ind_m, (SELECT distinct(reg_gu) FROM region WHERE reg_gucode=o.reg_gucode) reg_gu
+		FROM open_close o, (SELECT distinct(ind_m), ind_mcode
+							FROM industry) i
+		WHERE o.IND_MCODE=i.IND_MCODE AND o.IND_LCODE=#{ind_lcode} and reg_gucode=#{reg_gucode}
+		ORDER BY ind_m
+  	</select>
+  	
+  	<select id="getOpenCloseSiList" parameterType="map" resultType="open_closeVo">
+  		SELECT AVG(o.opcl_num) AS opcl_num, AVG(o.opcl_sop) AS opcl_sop, AVG(o.opcl_scl) AS opcl_scl,
+  				 AVG(o.opcl_hop) AS opcl_hop, AVG(o.opcl_hcl) AS opcl_hcl, i.ind_m
+		FROM open_close o, (SELECT DISTINCT(ind_m), ind_mcode FROM industry) i
+		WHERE o.IND_MCODE=i.IND_MCODE AND o.IND_LCODE=#{ind_lcode}
+		GROUP by ind_m
+		ORDER by ind_m
+  	</select>
+  
+  </mapper>

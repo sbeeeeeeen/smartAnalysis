@@ -1,0 +1,98 @@
+@CHARSET "EUC-KR";
+
+
+#quickMenu {
+ 	position: absolute; 
+	width: 102px;
+	height: 433px;
+	right: 200px;
+ 	top: 350px; 
+ 	background-color: #2e2e2e; 
+ 	color: #ffffff;
+ 	border:0.5px solid #d4d4d4;
+}
+
+
+
+div.quick-menu {
+    display: block;
+    width: 100px;
+    height: 70px;        
+    background-color: #2e2e2e; 
+    text-align:center;
+    color:#ffffff;
+    font-weight: bold;
+    padding-top: 10px;
+}
+
+
+
+span.quick-1 {
+    display: block;
+    width: 100px;
+    height: 80px;        
+    background-color: #ffffff; 
+    text-align:center;
+    color:#2e2e2e;
+    border-bottom: 0.5px solid #d4d4d4;
+    padding-top: 18px;
+    font-weight: bold;
+}
+span.quick-2 {
+    display: block;
+    width: 100px;
+    height: 80px;        
+    background-color: #ffffff; 
+    text-align:center;
+    color:#2e2e2e;
+    padding-top:25px;
+    border-bottom: 0.5px solid #d4d4d4; 
+    font-weight: bold;   
+}
+
+div.quick-top {
+    display: block;
+    width: 100px;
+    height: 43px;        
+    background-color:#2e2e2e; 
+    text-align:center;
+    color:white;
+    font-weight: bold;
+    padding-top: 10px;
+    border-bottom: 0.5px solid #d4d4d4;
+}
+
+#quickMenu span:hover{
+	cursor:pointer;
+}
+
+
+#quickMenu .quick{
+	color:black !important;
+	text-decoration: none !important;
+}
+
+#quickMenu .quick:hover{
+ 	color:black !important; 
+ 	text-decoration: none !important;
+}
+
+
+#quickMenu .quickTop{
+ 	color:white !important; 
+ 	text-decoration: none !important;
+}
+
+
+/* scroll to top */
+.scrollup{
+    position:fixed;
+/* 	width:32px; */
+/* 	height:32px; */
+/*     bottom:0px; */
+/*     right:20px; */
+/* 	background: #222; */
+	
+}
+
+

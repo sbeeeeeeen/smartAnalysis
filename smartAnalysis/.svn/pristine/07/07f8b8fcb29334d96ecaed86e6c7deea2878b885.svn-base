@@ -1,0 +1,347 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<script
+	src="https://cdn.anychart.com/releases/8.3.0/js/anychart-base.min.js"></script>
+<script
+	src="https://cdn.anychart.com/releases/8.3.0/js/anychart-ui.min.js"></script>
+<script
+	src="https://cdn.anychart.com/releases/8.3.0/js/anychart-exports.min.js"></script>
+<script
+	src="https://cdn.anychart.com/releases/8.3.0/js/anychart-radar.min.js"></script>
+<link rel="stylesheet"
+	href="https://cdn.anychart.com/releases/8.3.0/css/anychart-ui.min.css" />
+<link rel="stylesheet"
+	href="https://cdn.anychart.com/releases/8.3.0/fonts/css/anychart-font.min.css" />
+<script type="text/javascript" src="/Moderna/js/jquery.js"></script>
+
+<script type="text/javascript"
+	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=e2abfa4ebad90f565e86b2265455af41&libraries=services,clusterer,drawing"></script>
+<script type="text/javascript"
+	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=e2abfa4ebad90f565e86b2265455af41"></script>
+	
+<script>
+	var Ldata;
+	(function($) {
+		$.ajax({
+			url : "/location/analysisData",
+			async : false,
+			dataType : "JSON",
+			method : "post",
+			data : {
+				"analysisNum" : "${analysisNum}"
+			},
+			success : function(data) {
+				Ldata = data;
+
+			},
+			error : function() {
+				alert("error");
+			}
+		});
+
+	})(jQuery);
+	
+	$(document).ready(function(){
+		var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+	    mapOption = { 
+	        center: new daum.maps.LatLng(Ldata.analysisRecVo[0].an_COORY, Ldata.analysisRecVo[0].an_COORX), // 지도의 중심좌표
+	        level: 4 // 지도의 확대 레벨
+	    };
+	
+		// 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+		var map = new daum.maps.Map(mapContainer, mapOption); 
+		
+		var markerPosition  = new daum.maps.LatLng(Ldata.analysisRecVo[0].an_COORY, Ldata.analysisRecVo[0].an_COORX); 
+		
+		// 마커를 생성합니다
+		var marker = new daum.maps.Marker({
+		    position: markerPosition
+		});
+
+		// 마커가 지도 위에 표시되도록 설정합니다
+		marker.setMap(map);
+		
+	    map.setDraggable(false);
+	    map.setZoomable(false);
+		
+	    if(Ldata.floating.ft_count > Ldata.rectal.rs_count && Ldata.floating.ft_count > Ldata.residential.rst_COUNT){
+	    	$("#totalperson").html("유동");
+	    }else if(Ldata.rectal.rs_count > Ldata.residential.rst_COUN){
+	    	$("#totalperson").html("직장");
+	    }else{
+	    	$("#totalperson").html("주거");
+	    }
+	    
+	})
+	
+	console.log(Ldata);
+	
+</script>
+
+
+<style>
+#title {
+	font-family: 'Open Sans', Arial, sans-serif;
+	font-size: 20px;
+	margin-top: 50px;
+	margin-bottom: 10px;
+	padding: 30px;
+	padding-left: 0px;
+}
+
+.analysisRes {
+	border: 1px solid #d0d0d6;
+}
+
+.analysisRes th {
+	background: #f0f3f5;
+	text-align: center;
+	color: #333;
+	width: 50%;
+	vertical-align: middle;
+	border: 1px solid #d0d0d6;
+}
+.ana th{
+width: 33%;
+}
+
+.analysisRes td {
+	border: 1px solid #d0d0d6;
+	text-align: center;
+}
+
+#container {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+html, body, #container {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.help em {
+	background: #ccc /* url(../img/help.png) no-repeat top left */;
+	float: left;
+	display: inline-block;
+	width: 56px;
+	height: 18px;
+	margin-top: 3px;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 700;
+	padding-left: 9px;
+	padding-top: 1px;
+	font-style: normal;
+	margin: 0;
+	line-height: 150%;
+}
+
+.helpwrap {
+	background-color: #f5f6f1;
+	padding: 20px 17px;
+	margin: 0;
+}
+
+.help ul {
+	display: inline-block;
+	font-size: 13px;
+	max-width: 885px;
+}
+.resultwrap {
+    clear: both;
+    border-top: 2px solid #3c64db;
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    padding: 20px 0;
+    display: table;
+    width: 100%;
+    line-height: 160%;
+    margin: 50px 0 50px 0;
+}
+.resultwrap .col:nth-child(1) {
+    text-align: center;
+    width: 90px;
+    font-size: 18px;
+    padding: 0;
+}
+
+.resultwrap .col {
+    display: table-cell;
+    padding: 10px 15px;
+    vertical-align: middle;
+    word-break: break-all;
+    word-wrap: break-word;
+    vertical-align: middle;
+}
+.evaluation{
+	width: 500px;
+	height: 500px;
+	margin-bottom: 40px;
+}
+#map{
+	float: left;
+	width: 100%;
+	height: 100%;
+	
+}
+.mapwrap{
+	padding: 20px;
+	border: 1px solid #ccc;
+	width: 100%;
+	height: 100%;
+}
+
+</style>
+<div class="container">
+	<div class="page-header">
+		<h2>입지분석</h2>
+	</div>
+	<div id="title">분석설정정보</div>
+	<table class="table analysisRes">
+		<thead>
+			<tr>
+				<th>분석지역</th>
+				<th>기준데이터시점</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><script>
+					document
+							.write(Ldata.region.reg_si + " "
+									+ Ldata.region.reg_gu + " "
+									+ Ldata.region.reg_dong);
+				</script></td>
+				<td><script>
+					document.write(Ldata.analysisList[0].AN_DT)
+				</script></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div id="title">1. 평가종합</div>
+	<!-- 지도 출력 -->
+		<div class="evaluation">
+			<div class="mapwrap">
+				<div id="map"></div>
+			</div>
+		</div>
+
+	<div class="helpwrap">
+		<div class="help">
+			<em>도움말</em>
+			<ul>
+				<li><strong>종합입지등급</strong> : 선택입지에 대한 45개 표본업종 입지등급의 평균. 음식,
+					소매, 서비스업 등 표본업종별 입지의 가치(예상매출액)를 평가한 등급으로 1등급에 가까울수록 좋은 입지임을 의미합니다.
+					<strong>[예시]</strong> 전체 45개 입지등급 중 선택지역이 1등급인 표본업종의 수가 30개, 2등급인
+					업종이 10개, 4등급인 업종이 5개인 경우, {(1*30)+(2*10)+(4*5)}/45=1.6 → 산술평균을 반올림한
+					값을 이용, 종합 2등급으로 표시합니다.</li>
+				<li><strong>45개 표본업종의 매출에 영향을 미치는 X변수</strong>는 각각 다르게 추출합니다. <strong>[예시]</strong>
+					세탁소 : 30~40대 주거인구, 갈비/삼겹살 : 저녁 시간대 유동인구, 상권 매출규모</li>
+			</ul>
+		</div>
+	</div>
+
+	<div id="title">2. 업종별 입지등급</div>
+
+
+	<div>
+	<div style="height: 500px; width: 500px;">
+		<div id="container"></div>
+		<script type="text/javascript">
+			anychart.onDocumentReady(function() {
+				// create data set on our data
+				var dataSet = anychart.data.set([ [ '음식', 1 ], [ '서비스업', 2 ],
+						[ '소매업', 3 ], ]);
+
+				// map data for the first series, take x from the zero column and value from the first column of data set
+				var data1 = dataSet.mapAs({
+					'x' : 0,
+					'value' : 1
+				});
+				// create radar chart
+				var chart = anychart.radar();
+				console.log(chart);
+				console.log(chart.yScale());
+				// set chart yScale settings
+				chart.yScale().minimum(1).maximum(5).ticks().interval(1);
+
+				// set xAxis labels settings
+				chart.xAxis().labels().padding(5);
+
+				// set chart legend settings
+				chart.legend().align('center').enabled(true);
+
+				// create first series with mapped data
+				var series1 = chart.line(data1).name('대분류');
+				series1.markers().enabled(true).type('circle').size(3);
+
+				// chart tooltip format
+				chart.tooltip().format('Value: {%Value}');
+
+				// set container id for the chart
+				chart.container('container');
+				chart.draw();
+			});
+		</script>
+	</div>
+
+	</div>
+	
+	<div class="resultwrap">
+		<div class="col">분석<br><strong>결과</strong></div>
+		<div class="col">
+			<ul>
+				<li>선택하신 입지는 음식업 1등급, 서비스업 2등급, 소매업 2등급으로 에 가장 적한한 입지입니다.</li>
+				<li>ㅁㄴㅇ</li>
+				<li>ㄴㅇㄹㄹㅇㄴㄹㅇㄴㄹㅇ</li>
+			</ul>
+		</div>
+	</div>	
+	
+	<div id="title">3. 잠재고객 분석</div>
+	
+	
+	<table class="table analysisRes">
+		<thead class="ana">
+			<tr>
+				<th>유동인구(선택지역 내 반경 25m)</th>
+				<th>주거인구(선택지역)</th>
+				<th>직장인구(선택지역)</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><script>document.write(Ldata.floating.ft_count)</script> 명</td>
+				<td><script>document.write(Ldata.residential.rst_COUNT)</script> 명</td>
+				<td><script>document.write(Ldata.rectal.rs_count)</script> 명</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<div class="resultwrap">
+		<div class="col">분석<br><strong>결과</strong></div>
+		<div class="col"><ul><li>잠재고객이 될 가능성이 가장 큰 유형은 <strong><b id="totalperson"></b> 인구 </strong>입니다.</li></ul></div>
+	</div>	
+	
+	<div class="helpwrap">
+		<div class="help">
+			<em>도움말</em>
+			<ul>
+				<li>잠재고객이 될 가능성은 50명 이상 일 경우 해당됩니다.</li>
+				<li>유동인구는 통신사 휴대전화 통화량을 바탕으로 전국 50m셀로 추정한 유동인구수로 해당월 평균 추정데이터 입니다.</li>
+			</ul>
+		</div>
+	</div>
+	<br><br><br><br>
+</div>
+
+
+
+
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="rent">
+
+	<!-- 구 코드로 임대료 가져오기 -->
+	<select id="getRent" resultType="rentVo" parameterType="int">
+		select *
+		from rent where REG_GUCODE=#{REG_GUCODE}
+	</select>
+
+	<select id="getRentDt" resultType="rentVo" parameterType="int">
+		select
+		*
+		from rent where REG_GUCODE=#{REG_GUCODE} and rent_dt = '17/12/01'
+	</select>
+
+	<!-- 층수로 임대료 찾기 -->
+	<select id="getRentStairs" resultType="rentVo" parameterType="map">
+		select * from rent where REG_GUCODE=#{REG_GUCODE} and rent_stairs =
+		#{rent_stairs}
+	</select>
+
+	<!-- 임대료 자료 날짜 리스트 가져오기 -->
+	<select id="getRentDateList" resultType="rentVo" parameterType="int">
+		select distinct rent_dt from rent where REG_GUCODE=#{REG_GUCODE} order
+		by rent_dt
+	</select>
+</mapper>

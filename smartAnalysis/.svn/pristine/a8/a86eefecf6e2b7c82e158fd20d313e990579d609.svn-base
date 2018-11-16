@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="industry">
+	<select id="getInd_L" resultType="industryVo">
+		SELECT distinct ind_l, ind_lcode
+  		FROM industry
+	</select>
+	
+	<select id="getIndustryM" parameterType="String" resultType="industryVo">
+		SELECT distinct ind_m, ind_mcode
+		FROM industry
+		WHERE ind_lcode=#{lcode}
+	</select>
+	
+	<select id="getIndustryS" parameterType="String" resultType="industryVo">
+		SELECT distinct ind_s, ind_code
+		FROM industry
+		WHERE ind_mcode=#{mcode}
+	</select>
+	
+	<select id="getIndustryList" parameterType="java.util.List" resultType="industryVo">
+		SELECT *
+		FROM industry
+		WHERE ind_code in 
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

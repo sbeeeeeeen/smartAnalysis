@@ -1,0 +1,19 @@
+package kr.or.ddit.board.dao;
+
+import javax.annotation.Resource;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository("boardDao")
+public class BoardDao implements BoardDaoInf{
+
+	@Resource(name="sqlSessionTemplate")
+	SqlSessionTemplate template;
+	
+	@Override
+	public int getBoardnum(int id) {
+		return template.selectOne("board.getBoardnum", id);
+	}
+
+}

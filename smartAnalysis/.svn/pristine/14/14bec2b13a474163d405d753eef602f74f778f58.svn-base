@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="consulting">
+  	<insert id="insertConsulting" parameterType="consultingVo">
+  		INSERT INTO CONSULTING 
+  			VALUES(
+	  				cst_num.NEXTVAL
+	  				,#{pro_num}
+	  				,#{mem_id}
+	  				,'n'
+	  				,#{cst_content}
+	  				,#{cst_dt}
+	  				,'n'
+  				)
+  	</insert>
+  	
+  	<!-- 일정번호에 맞는 컨설팅 조회(컨설턴트) -->
+  	<select id="cstNumConsulting" parameterType="Integer" resultType="consultingVo">
+<!--   		SELECT * FROM consulting -->
+<!--   			WHERE cst_num=#{cst_num} -->
+  		SELECT cst_num
+  				,mem_id
+  				,cst_aprv
+  				,cst_content
+  				,cst_dt
+  				,(SELECT mem_id
+                  	FROM pro b
+                  WHERE a.pro_num = b.PRO_NUM) as pro_id
+                ,cst_pay
+		FROM consulting a
+		WHERE cst_num=#{cst_num}
+  	</select>
+  	
+  	<!-- 일정번호에 맞는 컨설팅 조회(회원) -->
+  	<select id="cstNumMemberConsulting" parameterType="Integer" resultType="consultingVo">
+  		SELECT * 
+  			FROM consulting
+  		WHERE cst_num=#{cst_num}
+  	</select>
+  	
+  	<!-- 컨설팅 페이지 리스트(컨설턴트) -->
+  	<select id="consultingPageList" parameterType="map" resultType="consultingVo">
+<!--   		SELECT * -->
+<!-- 			FROM (SELECT A.*, ROWNUM rn  -->
+<!-- 				FROM (SELECT consulting.* -->
+<!-- 					FROM consulting  -->
+<!--           				WHERE cst_aprv LIKE '%' || #{cst_aprv} || '%' -->
+<!-- 					ORDER BY cst_num DESC) A) -->
+<!-- 		WHERE rn BETWEEN (#{page}-1)*#{pageSize}+1 AND #{page}*#{pageSize} -->
+
+		SELECT *
+					FROM (SELECT A.*, ROWNUM rn 
+						FROM (SELECT consulting.*
+							FROM consulting 
+		          				WHERE cst_aprv LIKE '%' || #{cst_aprv} || '%' and pro_num = ( select b.PRO_NUM
+		                                                              from pro b
+		                                                              where b.MEM_ID = #{mem_id}
+		                                                         )
+							ORDER BY cst_num DESC) A)
+				WHERE rn BETWEEN (#{page}-1)*#{pageSize}+1 AND #{page}*#{pageSize}
+  	</select>
+  	
+  	<!-- 컨설팅 페이지 리스트(회원) -->
+  	<select id="consultingMemberPageList" parameterType="map" resultType="consultingVo">
+  		SELECT *
+			FROM (SELECT A.*, ROWNUM rn 
+				FROM (SELECT consulting.*
+					FROM consulting 
+						WHERE cst_aprv LIKE '%' || #{cst_aprv} || '%'
+					ORDER BY cst_num DESC) A)
+		WHERE rn BETWEEN (#{page}-1)*#{pageSize}+1 AND #{page}*#{pageSize}
+			AND mem_id=#{mem_id}
+  	</select>
+  	
+  	<select id="consultingCnt" resultType="Integer">
+  		SELECT COUNT(*) 
+  			FROM consulting
+  	</select>
+  	<!-- 컨설팅 승인여부 -->
+  	<update id="consultingYN" parameterType="Integer">
+  		UPDATE consulting
+		  SET cst_aprv='y'
+		WHERE cst_num=#{cst_num}
+  	</update>
+  	
+  	<!-- 컨설팅 결제여부 -->
+  	<update id="consultingPayYN" parameterType="Integer">
+  		UPDATE consulting
+		  SET cst_pay='y'
+		WHERE cst_num=#{cst_num}
+  	</update>
+  	
+  	<!-- 컨설팅 거절 -->
+  	<update id="deleteConsulting" parameterType="Integer">
+  		UPDATE consulting SET cst_aprv='d'
+		  WHERE cst_num =#{cst_num}
+  	</update>
+  	
+  	<update id="updateChannelId" parameterType="map">
+  		UPDATE member SET mem_chid=#{mem_chid}
+      		WHERE mem_id=#{mem_id}  	
+  	</update>
+  	
+  	<select id="getChannelId" parameterType="String" resultType="String">
+  		SELECT mem_chid
+		FROM member
+		WHERE mem_id=#{mem_id} 
+  	</select>
+  </mapper>

@@ -1,0 +1,486 @@
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+	pageEncoding="EUC-KR"%>
+
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="/Moderna/js/datepicker.min.js"></script>
+<script type="text/javascript" src="/Moderna/js/datepicker.en.js"></script>
+<link
+	href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"
+	rel="stylesheet">
+
+<link href="/css/datepicker.min.css" rel="stylesheet">
+
+<style type="text/css">
+.panel-default>.panel-heading {
+	color: #333;
+	background-color: #68a4c4;
+	border-color: #ddd;
+}
+
+a {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+#holder {
+	background: #eeeeee;
+}
+
+#holder {
+	overflow: hidden;
+}
+
+.node {
+	cursor: pointer;
+	stroke: #3182bd;
+	stroke-width: 1.5px;
+}
+
+.link {
+	fill: none;
+	stroke: #9ecae1;
+	stroke-width: 1.5px;
+}
+
+input[type=checkbox].css-checkbox {
+	position: absolute;
+	z-index: -1000;
+	left: -1000px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+}
+
+input[type=checkbox].css-checkbox+label.css-label {
+	padding-left: 25px;
+	height: 20px;
+	display: inline-block;
+	line-height: 20px;
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+input[type=checkbox].css-checkbox:checked+label.css-label {
+	background-position: 0 -20px;
+}
+
+label.css-label {
+	background-image:
+		url(http://csscheckbox.com/checkboxes/u/csscheckbox_5ed3110c2dbfa898cff4fe25b69ceb41.png);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.inputWithIcon input[type=text]{
+padding-left:40px;
+}
+.inputWithIcon{
+position:relative;
+}
+.inputWithIcon i{
+    position: absolute;
+    left: 20px;
+    /* top: 13px; */
+    padding: 9px 8px;
+    color: #aaa;
+    transition: .3s;
+  }
+
+.inputWithIcon input[type=text]:focus +i{
+color: #68a4c4;
+}
+
+</style>
+
+<script type="text/javascript">
+	// 달력 날짜 한국어로 변환시킴!
+	$.fn.datepicker.language['en'] = {
+		dateFormat : 'yyyy/mm/dd',
+		firstDay : 0,
+		today : '오늘 날짜',
+		clear : '닫기',
+		months : [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월',
+				'11월', '12월' ],
+		monthsShort : [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월',
+				'10월', '11월', '12월' ],
+		daysMin : [ '일', '월', '화', '수', '목', '금', '토' ],
+		daysShort : [ '일', '월', '화', '수', '목', '금', '토' ],
+		daysMin : [ '일', '월', '화', '수', '목', '금', '토' ],
+	};
+</script>
+</head>
+
+<body>
+	<!-- container -->
+	<div class="container ng-scope">
+
+		<!-- sns검색 큰 글자 -->
+		<div class="page-header">
+			<h2>SNS분석</h2>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<!-- 탭(1차) -->
+				<ul class="nav">
+					<li class="on active" style="display: inline-block;"><a> </a></li>
+
+				</ul>
+			</div>
+
+			<div class="panel-body">
+
+				<div class="col-lg-4"></div>
+				<div class="col-lg-3 inputWithIcon">
+					 <input
+						type="text" placeholder="예) 창업" id="input_keyword">
+					<i class="fa fa-search fa-lg fa-fw" aria-hidden="true"></i>
+				</div>
+
+
+				<p class="clearfix"></p>
+				<!-- 간격 벌리기 -->
+
+				<form class="form-inline text-center">
+
+					<ul class="snslist" style="display: inline-block;">
+
+						<li style="display: inline-block;"><input type="checkbox"
+							class="css-checkbox" id="checkall" value="all"><label
+							for="checkall" class="css-label">전체</label></li>
+
+						<li style="display: inline-block;"><input type="checkbox"
+							class="css-checkbox" value="news" id="checknews" name="checktg"><label
+							for="checknews" class="css-label">뉴스</label></li>
+
+						<li style="display: inline-block;"><input type="checkbox"
+							class="css-checkbox" value="blog" id="checkblog" name="checktg"><label
+							for="checkblog" class="css-label">블로그</label></li>
+
+					</ul>
+
+					<!-- 달력넣을 부분 -->
+					<input type="text" readonly data-range="true"
+						data-multiple-dates-separator=" - " data-language="en"
+						class="datepicker-here" id="datefromto" />
+
+					<div class="btn-group date_pick">
+						<a onclick="day();" id="day" class="btn btn-default">1일</a> <a
+							onclick="week();" id="week" class="btn btn-default">1주</a> <a
+							onclick="month();" id="month" class="btn btn-default">1개월</a> <input
+							type="hidden" id="timeunit" value="" />
+					</div>
+
+					<a class="btn btn-primary" id="recognition_search"
+						onclick="callAjax()">조회</a>
+
+				</form>
+			</div>
+		</div>
+
+		<div class="row">
+			<h3>언급량 추이</h3>
+			<div id="holder" class="col-md-11"></div>
+
+		</div>
+
+		<div class="row">
+			<h3>언급량 순위</h3>
+			<div class="col-md-11">
+				<table class="table table-striped table-hover">
+					<thead id="ttlRank">
+					</thead>
+
+					<tbody id="rank">
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</body>
+<script>
+	////////////////////////////////////////////////////////////////////
+	var init = function(selector, root) {
+		$(selector).html(" ");
+
+		var width = 1000, height = 1000, root;
+
+		var tick = function() {
+			link.attr("x1", function(d) {
+				return d.source.x;
+			}).attr("y1", function(d) {
+				return d.source.y;
+			}).attr("x2", function(d) {
+				return d.target.x;
+			}).attr("y2", function(d) {
+				return d.target.y;
+			});
+
+			node.attr("cx", function(d) {
+				return d.x;
+			}).attr("cy", function(d) {
+				return d.y;
+			});
+
+			labels.attr("x", function(d) {
+				return d.x;
+			}).attr("y", function(d) {
+				return d.y;
+			});
+		}
+
+		var force = d3.layout.force().size([ width, height ]).linkDistance(100)
+				.charge(-520).on("tick", tick);
+
+		var svg = d3.select(selector).append("svg").attr("width", width).attr(
+				"height", height);
+
+		var link = svg.selectAll(".link"), node = svg.selectAll(".node"), labels = svg
+				.selectAll(".labels");
+
+		var update = function() {
+			var nodes = flatten(root), links = d3.layout.tree().links(nodes);
+
+			// Restart the force layout.
+			force.nodes(nodes).links(links).start();
+
+			// Update the links…
+			link = link.data(links, function(d) {
+				return d.target.id;
+			});
+
+			// Exit any old links.
+			link.exit().remove();
+
+			// Enter any new links.
+			link.enter().insert("line", ".node").attr("class", "link").attr(
+					"x1", function(d) {
+						return d.source.x;
+					}).attr("y1", function(d) {
+				return d.source.y;
+			}).attr("x2", function(d) {
+				return d.target.x;
+			}).attr("y2", function(d) {
+				return d.target.y;
+			});
+
+			// Update the nodes…
+			node = node.data(nodes, function(d) {
+				return d.id;
+			}).style("fill", color); // 노드 색깔
+
+			// Exit any old nodes.
+			node.exit().remove();
+
+			// Enter any new nodes.
+			node.enter().append("circle").attr("class", "node").attr("cx",
+					function(d) {
+						return d.x;
+					}).attr("cy", function(d) {
+				return d.y;
+			}).attr("r", function(d) {
+				return Math.sqrt(d.size) / 10 || 4.5;
+			}).style("fill", color).on("click", click).call(force.drag);
+
+			labels = labels.data(nodes, function(d) {
+				return d.id;
+			})
+
+			// Exit any old labels.
+			labels.exit().remove();
+
+			labels.enter().append("text").attr("class", "labels").attr("x",
+					function(d) {
+						return d.x;
+					}).attr("y", function(d) {
+				return d.y;
+			}).attr("dx", 9).attr("dy", ".31em").text(function(d) {
+				return d.name;
+			}).style("fill-opacity", function(d) {
+				var opacity = 1;
+				if (d.name === "parentnode") {
+					opacity = 0;
+				}
+
+				return opacity;
+			})
+		}
+
+		// Color leaf nodes orange, and packages white or blue.
+		var color = function(d) {
+			return d._children ? "ea4335" : d.children ? "fbbc05" : "4285f4";
+		}
+
+		// Toggle children on click.
+		var click = function(d) {
+			if (!d3.event.defaultPrevented) {
+				if (d.children) {
+					d._children = d.children;
+					d.children = null;
+				} else {
+					d.children = d._children;
+					d._children = null;
+				}
+				update();
+			}
+		}
+
+		// Returns a list of all nodes under the root.
+		var flatten = function(root) {
+			var nodes = [], i = 0;
+
+			var recurse = function(node) {
+				if (node.children)
+					node.children.forEach(recurse);
+				if (!node.id)
+					node.id = ++i;
+				nodes.push(node);
+			}
+
+			recurse(root);
+			return nodes;
+		}
+		update();
+	}; // init 함수 끝나는 부분
+
+	function day() {
+		document.getElementById("timeunit").value = 'day';
+	}
+	function week() {
+		document.getElementById("timeunit").value = 'week';
+	}
+	function month() {
+		document.getElementById("timeunit").value = 'month';
+	}
+
+	function callAjax() {
+
+		var key = "6682823005424844847";
+
+		var arrayParam = []; //배열 초기화
+		if ($("input:checkbox[name=checktg]:checked").val() != null) {
+			$("input:checkbox[name=checktg]:checked").each(function() {
+				arrayParam.push($(this).val());
+			});
+		} else {
+			alert("타겟을 선택해 주세요");
+		}
+
+		var keyword = "";
+		if ($("#input_keyword").val() != "") {
+			keyword = $("#input_keyword").val();
+		} else {
+			alert("키워드를 입력해 주세요");
+		}
+		var string = "";
+		if ($("#datefromto").val() != "") {
+			string = $("#datefromto").val();
+		} else {
+			alert("날짜를 선택해 주세요");
+		}
+		var strArray = string.split(' - ');
+		var firstArray = strArray[0].split('/');
+		var toArray = strArray[1].split('/');
+
+		var from = firstArray[0] + firstArray[1] + firstArray[2];
+		var to = toArray[0] + toArray[1] + toArray[2];
+		var timeunit = $("#timeunit").val();
+
+		var parentInfo = new Object();
+		var childArray = new Array();
+		parentInfo.name = "parentnode"; //1
+		parentInfo.size = 15000;
+		$
+				.ajax({
+					url : "http://api.datamixi.com/datamixiApi/topictrend?key="
+							+ key + "&target=" + arrayParam + "&keyword="
+							+ keyword + "&from=" + from + "&to=" + to
+							+ "&timeunit=" + timeunit,
+					async : false,
+					success : function(data) {
+						for (var i = 0; i < data.return_object.trends.length; i++) {
+							var childchildArray = new Array();
+							var childInfo = new Object();
+							childInfo.name = data.return_object.trends[i].fromDate;
+							childInfo.size = 80000;
+
+							for (j = 1; j < data.return_object.trends[i].nodes.length; j++) { //nodes배열(16) x trends배열(2) 길이만큼 회전 
+								console.log(data.return_object.trends[i].nodes[j].name);
+								var childchildInfo = new Object();
+								childchildInfo.name = data.return_object.trends[i].nodes[j].name;
+								childchildInfo.size = 38120;
+								childchildArray.push(childchildInfo); //자식배열에 삽입 총 16개의 데이터 삽입
+							}
+
+							childInfo.children = childchildArray;
+							childArray.push(childInfo);
+						}
+						parentInfo.children = childArray; //2
+						console.log(parentInfo);
+						init("#holder", parentInfo);
+
+						/////////////////////////////////
+
+						var rankTableTtl = '';
+						rankTableTtl += "<tr> <th colspan=\"2\" scope=\"rowgroup\">날짜 넣어주세요.</th></tr>";
+						rankTableTtl += "<tr><th>순위</th><th>검색어</th></tr>";
+						$("#ttlRank").html(rankTableTtl);
+
+						var rankTable = '';
+
+						for (var i = 0; i < 10; i++) {
+							rankTable += '<tr>';
+							for (var j = 0; j < 3; j++) {
+								rankTable += '<td>' + i + '</td>';
+								if (data.return_object.trends[j].nodes === undefined) {
+									break;
+								}
+								if (data.return_object.trends[j].nodes[i].name !== undefined) {
+									rankTable += '<td>'
+											+ data.return_object.trends[j].nodes[i].name
+											+ '</td>';
+								} else {
+									rankTable += '<td>' + '' + '</td>';
+								}
+								if (data.return_object.trends.length == 1) {
+									break;
+								}
+							}
+							rankTable += '</tr>';
+
+						}
+						$("#rank").html(rankTable);
+
+					}
+				});
+	}
+
+	$(document).ready(function() {
+		//최상단 체크박스 클릭
+		$("#checkall").click(function() {
+			//클릭되었으면
+			if ($("#checkall").prop("checked")) {
+				//input태그의 name이 chk인 태그들을 찾아서 checked옵션을 true로 정의
+				$("input[name=checktg]").prop("checked", true);
+				//클릭이 안되있으면
+			} else {
+				//input태그의 name이 chk인 태그들을 찾아서 checked옵션을 false로 정의
+				$("input[name=checktg]").prop("checked", false);
+			}
+		})
+	})
+</script>
+
+</html>

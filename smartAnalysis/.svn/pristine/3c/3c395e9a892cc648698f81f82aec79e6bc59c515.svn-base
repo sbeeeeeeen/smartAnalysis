@@ -1,0 +1,352 @@
+package kr.or.ddit.member.web;
+
+import java.lang.ProcessBuilder.Redirect;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.annotation.Resource;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import kr.or.ddit.industry.model.IndustryVo;
+import kr.or.ddit.industry.service.IndustryServiceInf;
+import kr.or.ddit.member.model.MemberVo;
+import kr.or.ddit.member.service.MemberServiceInf;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+@RequestMapping("/member")
+@Controller("memberController")
+public class MemberController {
+	
+	private Logger logger = LoggerFactory.getLogger(MemberController.class);
+	
+	@Resource(name="memberService")
+	private MemberServiceInf memberService;
+	
+	@Resource(name="industryService")
+	private IndustryServiceInf industryService;
+	
+	
+	//로그인 한 사용자 메인화면
+	@RequestMapping("/main")
+	public String view1(){
+		return "smartMain";
+	}
+	
+	//로그인 화면
+	@RequestMapping("/login")
+	public String view(){
+		
+		return "login";
+	}
+	
+	
+
+	
+	//로그인 처리 
+	@RequestMapping(value="/loginProcess", method = RequestMethod.POST)
+	public String loginProcess(@RequestParam(value="userId")String userId,
+							   @RequestParam(value="password")String password,
+							   MemberVo memVo,
+							   HttpSession session){
+		
+		//로그인 프로세스
+		memVo = memberService.getOneMember(userId);
+		
+		if(memVo== null){
+			return "redirect:/member/login";
+			
+		}
+		
+		if(memVo.vaildateUser(userId, password)){
+			session.setAttribute("memberVo", memVo);
+			return "redirect:/member/main";
+			
+		} else{
+			return "login";
+		}
+	}
+	
+	
+	//로그아웃 처리
+	@RequestMapping("/logout")
+	public String logout(HttpSession session){
+		session.removeAttribute("memberVo");
+		return "redirect:/member/login";
+		
+	}
+	
+	/*---------------------------------------------마이페이지---------------------------------------------- */
+	
+	//마이페이지 수정
+	@RequestMapping("/mypage")
+	public String mypage(){
+
+		return "mypage";
+	}
+	
+	/*---------------------------------------------회원가입---------------------------------------------- */
+	
+	//회원가입 폼 화면
+	@RequestMapping("/join")
+	@ResponseBody
+	public ModelAndView join(@RequestBody String ind_L){
+		ModelAndView mav = new ModelAndView("join");
+		
+		//대분류 리스트
+		List<IndustryVo> ind_Llist = new ArrayList<IndustryVo>();
+		ind_Llist = industryService.getInd_L();
+		
+		mav.addObject("ind_Llist",ind_Llist);
+		return mav;
+	}
+	
+	
+	
+	//회원가입 프로세스
+	@RequestMapping(value="/joinProcess",method = RequestMethod.POST)
+	public String joinProcess(@RequestParam(value="ind_code")String ind_code,
+							  MemberVo memberVo){
+		
+		memberVo.setInd_code(ind_code);
+		memberVo.setMem_del('y');
+		memberService.insertMember(memberVo);
+		
+		return "redirect:/member/login";
+	}
+	
+	//아이디 중복체크
+	@RequestMapping(value = "/idCheck", method=RequestMethod.POST)
+    @ResponseBody
+    public Map<Object, Object> idcheck(@RequestBody String mem_id) {
+        int count = 0;
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        count = memberService.idcheck(mem_id);
+        map.put("cnt", count);
+ 
+        return map;
+    }
+	
+	//이메일 중복체크
+	@RequestMapping(value = "/emailCheck", method=RequestMethod.POST)
+    @ResponseBody
+    public Map<Object, Object> emailCheck(@RequestBody String mem_email) {
+        int count = 0;
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        count = memberService.emailCheck(mem_email);
+        map.put("cnt", count);
+ 
+        return map;
+    }
+	
+	//중분류 리스트 가져오기
+	@RequestMapping(value="/mList", method=RequestMethod.POST)
+	@ResponseBody
+	public ModelAndView Mlist(@RequestBody String l_code){
+		ModelAndView mav = new ModelAndView("jsonView");
+		List<IndustryVo> ind_mList = new ArrayList<IndustryVo>();
+		ind_mList = industryService.getIndustryM(l_code);
+		mav.addObject("ind_mList", ind_mList);
+		return mav;
+	}
+	
+	//소분류 리스트 가져오기
+	@RequestMapping(value="/sList", method=RequestMethod.POST)
+	@ResponseBody
+	public ModelAndView Slist(@RequestBody String m_code){
+		ModelAndView mav = new ModelAndView("jsonView");
+		List<IndustryVo> ind_sList = new ArrayList<IndustryVo>();
+		ind_sList = industryService.getIndustryS(m_code);
+		mav.addObject("ind_sList", ind_sList);
+		return mav;
+	}
+	
+	///이메일 인증번호
+	@RequestMapping(value="/emailAuth", method=RequestMethod.POST)
+	@ResponseBody
+	public Map<Object, Object> emailAuth(@RequestBody String email, HttpServletResponse response, HttpServletRequest request) throws Exception{
+		
+		
+		String authNum = "";
+		authNum = RandomNum();
+
+		
+		sendEmail(email, authNum);
+		
+		Map<Object, Object> map = new HashMap<Object, Object>();
+		
+		map.put("mem_email", email);
+		map.put("authNum", authNum);
+		return map;
+	}
+	
+	
+	private void sendEmail(String email, String param) throws Exception {
+		
+		//메일 관련 정보
+		String host = "smtp.naver.com";
+		final String username = "cxzhappy";
+		final String password = "tkdnsk1908!";
+		int port = 465;
+		
+		//인증번호 전달 메일 내용
+		String subject = "[대전 스마트 상권분석 ] 회원가입 인증번호 전달";
+		String fromName = "관리자";
+		String to1 = email;
+		
+		String content = "인증번호["+param+ "]";
+		
+		Properties props = System.getProperties();
+        
+        
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.ssl.enable", "true");
+        props.put("mail.smtp.ssl.trust", host);
+        
+        Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
+            String un=username;
+            String pw=password;
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(un, pw);
+            }
+        });
+        session.setDebug(true); //for debug
+        
+
+    	Message mimeMessage = new MimeMessage(session);
+    	mimeMessage.setFrom(new InternetAddress("cxzhappy@naver.com"));
+    	mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(to1));
+    	mimeMessage.setSubject(subject);
+    	mimeMessage.setText(content);
+    	Transport.send(mimeMessage);
+        	
+
+
+		
+	}
+
+	//인증번호 발생 메소드
+	private String RandomNum() {
+		StringBuffer buffer = new StringBuffer();
+		for(int i=0; i<=6; i++){
+			int n = (int)(Math.random() * 10);
+			buffer.append(n);
+		}
+		return buffer.toString();
+	}
+
+	/*---------------------------------------------아이디/비밀번호 찾기---------------------------------------------- */
+
+	@RequestMapping("/findId")
+	public String findId(){
+		return "findId";
+	}
+	
+	@RequestMapping(value="/findIdProcess", method=RequestMethod.POST)
+	@ResponseBody
+	public Map<Object, Object> findIdProcess (@RequestParam(value="email") String email, @RequestParam(value="name") String name) throws Exception{
+		
+		Map<Object, Object> map = new HashMap<Object, Object>();
+		MemberVo memberVo = memberService.emailOneMember(email);
+		System.out.println("======="+name);
+		
+		if(memberVo==null){
+			map.put("error", email);
+			return map;
+			
+		}else{
+			
+			String mem_id = memberVo.getMem_id();
+			String mem_name = memberVo.getMem_name();
+			String mem_email = memberVo.getMem_email();
+			
+
+			sendEmailId(email, mem_id, mem_name);
+				
+
+			
+			map.put("mem_id", mem_id);
+			map.put("mem_name", mem_name);
+			map.put("mem_email", mem_email);
+			
+			
+			
+			return map;
+			
+		}
+		
+	}
+	
+	private void sendEmailId(String email, String mem_id, String mem_name) throws Exception {
+		
+		//메일 관련 정보
+		String host = "smtp.naver.com";
+		final String username = "cxzhappy";
+		final String password = "tkdnsk1908!";
+		int port = 465;
+		
+		//메일 내용
+		String subject = "아이디를 확인해주세요";
+		String fromName = "관리자";
+		String to1 = email;
+		
+		String content = mem_name+"님의 아이디는[ "+mem_id+" ] 입니다";
+		
+		Properties props = System.getProperties();
+        
+        
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.ssl.enable", "true");
+        props.put("mail.smtp.ssl.trust", host);
+        
+        Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
+            String un=username;
+            String pw=password;
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(un, pw);
+            }
+        });
+        session.setDebug(true); //for debug
+          
+        Message mimeMessage = new MimeMessage(session);
+        mimeMessage.setFrom(new InternetAddress("cxzhappy@naver.com"));
+        mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(to1));
+        mimeMessage.setSubject(subject);
+        mimeMessage.setText(content);
+        Transport.send(mimeMessage);
+		
+
+		
+	}
+	
+	
+	
+
+	
+	
+
+}

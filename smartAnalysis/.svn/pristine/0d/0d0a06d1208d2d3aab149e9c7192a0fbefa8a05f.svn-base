@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cooperative">
+
+	<select id="getCooperativeList" resultType="cooperativeVo"
+		parameterType="int">
+		SELECT COOP_NUM, COOP_DIV,
+		(SELECT MEM_NAME
+		FROM MEMBER
+		WHERE MEM_ID = a.MEM_ID) as MEM_ID
+		FROM cooperative a
+		WHERE CSHIP_NUM = #{cship_num} and a.coop_div !='0'
+	</select>
+
+	<update id="deleteCooperative" parameterType="cooperativeVo">
+		UPDATE cooperative SET coop_div = '0'
+		WHERE coop_num = #{coop_num}
+	</update>
+	
+	<insert id="insertCooperative" parameterType="cooperativeVo">
+		insert into cooperative values(coop_num.nextval, #{mem_id}, #{coop_div}, #{cship_num})
+	</insert>
+
+</mapper>

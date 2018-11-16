@@ -1,0 +1,62 @@
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+	pageEncoding="EUC-KR"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>Insert title here</title>
+<script>
+	$.ajax({
+		url : 'PublicData.do',
+		type : 'get',
+		dataType : 'json',
+		success : function(data) {
+			console.log(data);
+			// 	          console.log(data.response.body.items.item);
+			var myItem = data.return_object.trands.nodes;
+
+			for (var i = 0; myItem.length; i++) {
+				var output = '';
+				console.log(myItem.length);
+				output += '<h3>' + i + 'SNS분석' + '</h3>';
+				output += '<h4>' + myItem[i].id + '</h4>';
+				output += '<h4>' + myItem[i].name + '</h4>';
+				output += '<h4>' + myItem[i].weight + '</h4>';
+				document.body.innerHTML += output;
+			}
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("Status: " + textStatus);
+			alert("Error: " + errorThrown);
+		}
+	});
+</script>
+</head>
+<body>
+	<form action="/SnsAnalysisServlet" method="get">
+		<input type="submit" value="데이터보기" />
+		<button id="myButton1">축제 보기</button>
+	</form>
+		<c:forEach items="${jsonResult}" var="vo">
+			<c:choose>
+				<c:when test="${vo !empty}">
+					<div class="col-sm-6">
+						<label class="control-label">${vo.id}</label>
+					</div>
+					<div class="col-sm-2">
+						<label class="control-label">${vo.name}</label>
+					</div>
+					<div class="col-sm-2">
+						<label class="control-label">${vo.weight}</label>
+					</div>
+					<div class="col-sm-2">
+						<input type="submit" class="btn btn-default" id="delReply"
+							value="+">
+					</div>
+				</c:when>
+			</c:choose>
+		</c:forEach>
+</body>
+</html>

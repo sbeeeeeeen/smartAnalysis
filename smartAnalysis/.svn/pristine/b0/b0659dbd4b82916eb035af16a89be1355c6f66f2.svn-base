@@ -1,0 +1,27 @@
+package kr.or.ddit.cooperative.dao;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import kr.or.ddit.cooperative.model.CooperativeVo;
+@Repository("cooperativeDao")
+public class CooperativeDao implements CooperativeDaoInf{
+
+	@Resource(name="sqlSessionTemplate")
+	SqlSessionTemplate template;
+	
+	@Override
+	public List<CooperativeVo> getCooperativeList(int cship_num) {
+		return template.selectList("cooperative.getCooperativeList", cship_num);
+	}
+
+	@Override
+	public int deleteCooperative(int coop_num) {
+		return template.update("cooperative.deleteCooperative", coop_num);
+	}
+
+}

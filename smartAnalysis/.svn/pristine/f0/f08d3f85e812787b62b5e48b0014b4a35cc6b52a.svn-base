@@ -1,0 +1,180 @@
+package kr.or.ddit.consulting.web;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
+import kr.or.ddit.consulting.model.ConsultingVo;
+import kr.or.ddit.consulting.service.ConsultingServiceInf;
+import kr.or.ddit.member.model.MemberVo;
+import kr.or.ddit.member.service.MemberServiceInf;
+import kr.or.ddit.pro.model.ProVo;
+import kr.or.ddit.pro.service.ProServiceInf;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@RequestMapping(value="/consulting")
+@Controller(value="consultingController")
+public class ConsultingController {
+	
+	@Resource(name="proService")
+	private ProServiceInf proService;
+	
+	@Resource(name="consultingService")
+	private ConsultingServiceInf consultingService;
+	
+	@RequestMapping(value="/request")
+	public String consulting(Model model){
+		List<ProVo> proList = proService.proList();
+		model.addAttribute("proList", proList);
+		
+		return "consulting";
+	}
+	
+	@RequestMapping(value="/submit")
+	@ResponseBody
+	public void consultintSubmit(
+									@RequestParam(value="pro_num")int pro_num
+									,@RequestParam(value="cst_content")String cst_content
+									,@RequestParam(value="cst_dt")Date cst_dt
+									,HttpSession session
+									,ConsultingVo consultingVo
+								) throws UnsupportedEncodingException{
+		
+		cst_content = URLDecoder.decode(cst_content, "UTF-8");
+		MemberVo memberVo = (MemberVo) session.getAttribute("memberVo");
+		String mem_id = memberVo.getMem_id();
+		
+		consultingVo.setPro_num(pro_num);
+		consultingVo.setMem_id(mem_id);
+		consultingVo.setCst_content(cst_content);
+		consultingVo.setCst_dt(cst_dt);
+		
+		consultingService.insertConsulting(consultingVo);
+	}
+	
+	@RequestMapping(value="/schedule")
+	public String scheduleManagement(
+										@RequestParam(value="page",defaultValue="1")int page
+										,@RequestParam(value="pageSize",defaultValue="10")int pageSize
+										,@RequestParam(value="cst_aprv",defaultValue="")String cst_aprv
+										,Model model
+									){
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("cst_aprv", cst_aprv);
+		
+		Map<String, Object> resultMap = consultingService.consultingPageList(paramMap);
+		List<ConsultingVo> consultingList = (List<ConsultingVo>) resultMap.get("consultingPageList");
+		model.addAttribute("consultingList", consultingList);
+		
+		model.addAllAttributes(resultMap);
+		
+		return "scheduleManagement";
+	}
+	
+	@RequestMapping(value="/memberConsultingCheck")
+	public String myConsultingCheck(
+									@RequestParam(value="page",defaultValue="1")int page
+									,@RequestParam(value="pageSize",defaultValue="10")int pageSize
+									,@RequestParam(value="mem_id")String mem_id
+									,@RequestParam(value="cst_aprv",defaultValue="")String cst_aprv
+									,Model model
+								){
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("mem_id", mem_id);
+		paramMap.put("cst_aprv", cst_aprv);
+		
+		Map<String, Object> resultMap = consultingService.consultingMemberPageList(paramMap);
+		List<ConsultingVo> consultMemberList = (List<ConsultingVo>) resultMap.get("consultingMemberPageList");
+		
+		model.addAttribute("consultMemberList", consultMemberList);
+		
+		model.addAllAttributes(resultMap);
+		
+		return "myConsultingCheck";
+	}
+	
+	@RequestMapping(value="/detail")
+	public String scheduleDetail(
+									@RequestParam(value="id")int cst_num
+									,Model model
+								){
+		ConsultingVo consultingVo = consultingService.cstNumConsulting(cst_num);
+		model.addAttribute("consultingVo", consultingVo);
+		return "scheduleManagementPost";
+	}
+	
+	@RequestMapping(value="/aprvYN")
+	@ResponseBody
+	public Map<String, Object> consultingYN(
+											@RequestParam(value="page",defaultValue="1")int page
+											,@RequestParam(value="pageSize",defaultValue="10")int pageSize
+											,@RequestParam(value="cst_aprv")String cst_aprv
+										){
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("cst_aprv", cst_aprv);
+		
+		Map<String, Object> resultMap = consultingService.consultingPageList(paramMap);
+		
+		return resultMap;
+	}
+	
+	@RequestMapping(value="/aprvYNMember")
+	@ResponseBody
+	public Map<String, Object> ConsultingYNMember(
+			@RequestParam(value="page",defaultValue="1")int page
+			,@RequestParam(value="pageSize",defaultValue="10")int pageSize
+			,@RequestParam(value="cst_aprv")String cst_aprv
+			,HttpSession session
+			){
+		MemberVo memberVo = (MemberVo) session.getAttribute("memberVo");
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("cst_aprv", cst_aprv);
+		paramMap.put("mem_id", memberVo.getMem_id());
+		
+		Map<String, Object> resultMap = consultingService.consultingMemberPageList(paramMap);
+		
+		return resultMap;
+	}
+	
+	@RequestMapping(value="/yUpdate")
+	public String consultingY(@RequestParam(value="cst_num")int cst_num){
+		consultingService.consultingYN(cst_num);
+		return "redirect:/consulting/schedule";
+	}
+	
+	@RequestMapping(value="/myConsult")
+	public String myConsultSchedule(){
+		return "myConsultSchedule";
+	}
+	
+	@RequestMapping(value="/myConsultingDetail")
+	public String myConsultingDetail(
+										@RequestParam(value="id")int cst_num
+										,Model model
+									){
+		ConsultingVo consultingVo = consultingService.cstNumMemberConsulting(cst_num);
+		
+		model.addAttribute("consultingVo", consultingVo);
+		
+		return "myConsultingCheckDetail";
+	}
+}

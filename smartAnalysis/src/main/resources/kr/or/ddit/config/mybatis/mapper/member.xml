@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member">
+
+	<!-- 전체 회원 정보 조회(관리자 제외) -->
+	<select id="selectAllMembers" resultType="memberVo">
+		SELECT * FROM member where mem_id != 'admin207'
+	</select>
+	
+	<!-- 회원 정보 조회 -->
+	<select id="getOneMember" resultType="memberVo" parameterType="String">
+		SELECT * FROM member
+		WHERE mem_id=#{mem_id}
+	</select>
+	
+	
+	<select id="getOneMemberVo" resultType="memberVo" parameterType="memberVo">
+		SELECT * FROM member
+		WHERE mem_id = #{mem_id}
+	</select>
+	
+	<!-- 회원 추가 -->
+	<insert id="insertMember" parameterType="memberVo">
+		INSERT INTO member (mem_id, ind_code, mem_pass, mem_email, mem_name, mem_call, mem_add, mem_type, mem_del)
+		VALUES(#{mem_id}, #{ind_code}, #{mem_pass}, #{mem_email}, #{mem_name}, #{mem_call}, #{mem_add}, #{mem_type}, #{mem_del})
+	</insert>
+	
+	<!-- 아이디 중복 체크 -->
+	<select id="idcheck" parameterType="String" resultType="Integer">
+		SELECT COUNT(*) FROM member WHERE mem_id = #{mem_id}
+	</select>
+	
+	<!-- 이메일 중복 체크 -->
+	<select id="emailCheck" parameterType="String" resultType="Integer">
+		SELECT COUNT(*) FROM member WHERE mem_email = #{mem_email}
+	</select>
+	
+	<!-- 이메일로 회원 조회 -->
+	<select id="findId" parameterType="String" resultType="memberVo">
+		SELECT * FROM member WHERE mem_email = #{mem_email}
+	</select>
+	
+	<!-- 회원정보 수정 -->
+	<update id="updateMem" parameterType="memberVo">
+		UPDATE member
+		SET ind_code = #{ind_code}, mem_pass = #{mem_pass}, mem_email = #{mem_email}, mem_call = #{mem_call}, mem_add = #{mem_add}, mem_type = #{mem_type}, mem_del= #{mem_del}
+		WHERE mem_id = #{mem_id}
+	</update>
+	
+	<!-- 학생 정보 페이징 조회 -->
+	<select id="getMemberPageList" resultType="memberVo" parameterType="map">
+		SELECT *
+		  FROM
+		      (SELECT a.*, ROWNUM rn
+		         FROM
+					(SELECT *
+					   FROM member
+					   WHERE mem_id != 'admin207' and mem_del='y'
+					ORDER BY mem_id) a )
+		WHERE rn BETWEEN (#{page}-1)*#{pageSize}+ 1 AND #{page}*#{pageSize}
+	</select>
+	
+	<!-- 회원 전체 건수 조회 -->
+	<select id="getMemberTotCnt" resultType="int">
+		SELECT count(*)
+ 		  FROM member
+ 		WHERE mem_id != 'admin207' and mem_del='y'
+	</select>
+	
+
+
+	
+
+</mapper>

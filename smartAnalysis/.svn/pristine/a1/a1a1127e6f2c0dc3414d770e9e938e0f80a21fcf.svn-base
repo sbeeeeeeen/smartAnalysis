@@ -1,0 +1,59 @@
+package kr.or.ddit.jumpo.web;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import kr.or.ddit.industry.model.IndustryVo;
+import kr.or.ddit.industry.service.IndustryServiceInf;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+@RequestMapping("/jumpo")
+@Controller("jumpoController")
+public class JumpoController {
+
+	@Resource(name = "industryService")
+	private IndustryServiceInf industryService;
+
+	// 점포검색 메인창, 대분류
+	@RequestMapping(value = "/view")
+	public ModelAndView view() {
+
+		ModelAndView mav = new ModelAndView("jumpoMain");
+
+		List<IndustryVo> Ind_lList = industryService.getInd_L();
+		mav.addObject("Ind_lList", Ind_lList);
+
+		return mav;
+
+	}
+
+	//업종 중분류 리스트
+	@RequestMapping("/ind_l")
+	public ModelAndView ind_lView(@RequestParam(value = "ind_l") String ind_l) {
+
+		ModelAndView mav = new ModelAndView("jsonView");
+
+		List<IndustryVo> Ind_mList = industryService.getIndustryM(ind_l);
+		mav.addObject("Ind_mList", Ind_mList);
+
+		return mav;
+	}
+
+	// 업종 소분류 리스트
+	@RequestMapping("/ind_m")
+	public ModelAndView ind_mView(@RequestParam(value = "ind_m") String ind_m) {
+
+		ModelAndView mav = new ModelAndView("jsonView");
+
+		List<IndustryVo> Ind_sList = industryService.getIndustryS(ind_m);
+		mav.addObject("Ind_sList", Ind_sList);
+
+		return mav;
+	}
+
+}

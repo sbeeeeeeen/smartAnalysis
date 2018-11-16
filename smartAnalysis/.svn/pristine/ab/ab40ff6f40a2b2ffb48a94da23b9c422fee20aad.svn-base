@@ -1,0 +1,27 @@
+package kr.or.ddit.rent.model;
+
+public class RentVo {
+	private int rent_num;
+	private int reg_code;
+	private int rent_avg;
+	public int getRent_num() {
+		return rent_num;
+	}
+	public void setRent_num(int rent_num) {
+		this.rent_num = rent_num;
+	}
+	public int getReg_code() {
+		return reg_code;
+	}
+	public void setReg_code(int reg_code) {
+		this.reg_code = reg_code;
+	}
+	public int getRent_avg() {
+		return rent_avg;
+	}
+	public void setRent_avg(int rent_avg) {
+		this.rent_avg = rent_avg;
+	}
+	
+	
+}

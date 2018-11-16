@@ -1,0 +1,47 @@
+package kr.or.ddit.guide.dao;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import kr.or.ddit.guide.model.GuideVo;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository("guideDao")
+public class GuideDao implements GuideDaoInf {
+	
+	@Resource(name="sqlSessionTemplate")
+	private SqlSessionTemplate template;
+
+	/**
+	 * 
+	 * Method : selectAllGuide
+	 * 최초작성일 : 2018. 8. 29.
+	 * 작성자 : PC23
+	 * 변경이력 :
+	 * @return
+	 * Method 설명 : 전체 가이드 정보 조회
+	 */
+	@Override
+	public List<GuideVo> selectAllGuide() {
+		return template.selectList("guide.selectAllGuide");
+	}
+
+	/**
+	 * 
+	 * Method : selectOneGuide
+	 * 최초작성일 : 2018. 8. 29.
+	 * 작성자 : PC23
+	 * 변경이력 :
+	 * @param gu_num
+	 * @return
+	 * Method 설명 : 가이드번호로 조회
+	 */
+	@Override
+	public GuideVo selectOneGuide(int gu_num) {
+		return template.selectOne("guide.selectOneGuide", gu_num);
+	}
+
+}

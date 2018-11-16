@@ -1,0 +1,20 @@
+package kr.or.ddit.residential.service;
+
+import javax.annotation.Resource;
+
+import kr.or.ddit.residential.dao.ResidentialDaoInf;
+import kr.or.ddit.residential.model.ResidentialVo;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class ResidentialService implements ResidentialServiceInf{
+	@Resource
+	private ResidentialDaoInf residentialDao;
+
+	@Override
+	public ResidentialVo getResidentialVo(long reg_code) {
+		return residentialDao.getResidentialVo(reg_code);
+	}
+
+}

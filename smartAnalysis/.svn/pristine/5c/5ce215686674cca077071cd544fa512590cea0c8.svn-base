@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- <properties resource="kr/or/ddit/config/mybatis/db.properties"/> -->
+
+	<typeAliases>
+		<typeAlias type="kr.or.ddit.analysis_res.model.AnalysisResVo" alias="analysisResVo"/>
+		<typeAlias type="kr.or.ddit.analysis_res.model.AnalysisRecVo" alias="analysisRecVo"/>
+		<typeAlias type="kr.or.ddit.analysis_res.model.AnalysisCodeVo" alias="analysisCodeVo"/>
+		<typeAlias type="kr.or.ddit.analysis_res.model.AnalysisTableVo" alias="analysisTableVo"/>
+		<typeAlias type="kr.or.ddit.board.model.BoardVo" alias="boardVo"/>
+		<typeAlias type="kr.or.ddit.comments.model.CommentsVo" alias="commentsVo"/>
+		<typeAlias type="kr.or.ddit.consulting.model.ConsultingVo" alias="consultingVo"/>
+		<typeAlias type="kr.or.ddit.cooperative.model.CooperativeVo" alias="cooperativeVo"/>
+		<typeAlias type="kr.or.ddit.copartnership.model.CopartnershipVo" alias="copartnershipVo"/>
+		<typeAlias type="kr.or.ddit.copartnership.model.CopartnershipViewVo" alias="CopartnershipViewVo"/>
+		<typeAlias type="kr.or.ddit.facility.model.FacilityVo" alias="facilityVo"/>
+		<typeAlias type="kr.or.ddit.floating.model.FloatingVo" alias="floatingVo"/>
+		<typeAlias type="kr.or.ddit.guide.model.GuideVo" alias="guideVo"/>
+		<typeAlias type="kr.or.ddit.industry.model.IndustryVo" alias="industryVo"/>
+		<typeAlias type="kr.or.ddit.map.model.MapVo" alias="mapVo"/>
+		<typeAlias type="kr.or.ddit.member.model.MemberVo" alias="memberVo"/>
+		<typeAlias type="kr.or.ddit.message.model.MessageVo" alias="messageVo"/>
+		<typeAlias type="kr.or.ddit.post.model.PostVo" alias="postVo"/>
+		<typeAlias type="kr.or.ddit.pro.model.ProVo" alias="proVo"/>
+		<typeAlias type="kr.or.ddit.profit.model.ProfitVo" alias="profitVo"/>
+		<typeAlias type="kr.or.ddit.rating.model.RatingVo" alias="ratingVo"/>
+		<typeAlias type="kr.or.ddit.rating.model.RatingGradeVo" alias="ratingGradeVo"/>
+		<typeAlias type="kr.or.ddit.rectal.model.RectalVo" alias="rectalVo"/>
+		<typeAlias type="kr.or.ddit.region.model.RegionVo" alias="regionVo"/>
+		<typeAlias type="kr.or.ddit.rent.model.RentVo" alias="rentVo"/>
+		<typeAlias type="kr.or.ddit.residential.model.ResidentialVo" alias="residentialVo"/>
+		<typeAlias type="kr.or.ddit.schedule.model.ScheduleVo" alias="scheduleVo"/>
+		<typeAlias type="kr.or.ddit.train.model.TrainVo" alias="trainVo"/>
+		<typeAlias type="kr.or.ddit.upfile.model.UploadFileVo" alias="upFileVo"/>
+		<typeAlias type="kr.or.ddit.utilization.model.UtilizationVo" alias="utilVo"/>
+		<typeAlias type="kr.or.ddit.open_close.model.Open_closeVo" alias="open_closeVo"/>
+	</typeAliases>
+	
+	<mappers>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/analysisRes.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/board.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/comments.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/consulting.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/cooperative.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/copartnership.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/facility.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/floating.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/guide.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/industry.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/map.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/member.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/message.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/post.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/pro.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/profit.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/rating.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/rectal.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/region.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/rent.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/residential.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/schedule.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/train.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/upfile.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/utilization.xml"/>
+	  <mapper resource="kr/or/ddit/config/mybatis/mapper/openclose.xml"/>
+	</mappers>
+
+</configuration>

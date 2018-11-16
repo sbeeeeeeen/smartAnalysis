@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="company">
+  
+  <select id="getCompanyInfo" parameterType="long" resultType="companyVo">
+ 	select com_cnt, 
+        com_work, 
+       (SELECT I.INDU_NAME FROM INDUSTRIAL I WHERE I.INDU_CODE = A.COM_IND)INDU_NAME
+  	from company A
+    WHERE REG_GUCODE=#{REG_GUCODE}
+  </select>
+  
+  </mapper>

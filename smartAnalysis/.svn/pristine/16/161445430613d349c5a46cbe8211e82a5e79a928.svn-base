@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="schedule">
+  
+  <select id="getSchedule" resultType="scheduleVo" parameterType="int">
+  	SELECT CPSS_NUM,CSHIP_NUM, (CPSS_SDT + 9/24) as CPSS_SDT,CPSS_CONTENT,(CPSS_EDT + 9/24) as CPSS_EDT ,CPSS_TITLE 
+	  	FROM schedule
+	  	WHERE cship_num = #{id}
+	  	ORDER BY cpss_sdt DESC
+  </select>
+  
+  <insert id="insertSchedule" parameterType="scheduleVo">
+  	insert into schedule(
+  							cpss_num
+  							,cship_num
+  							,cpss_sdt
+  							,cpss_content
+  							,cpss_edt
+  							,cpss_title
+  							,pro_num
+  						) 
+  				VALUES (
+  							cpss_num.nextval
+  							<choose>
+  								<when test="cship_num != 0">
+  									,#{cship_num}
+  								</when>
+  								<otherwise>
+  									,null
+  								</otherwise>
+  							</choose>
+  							,#{cpss_Sdt}
+  							,#{cpss_content}
+  							,#{cpss_Edt}
+  							,#{cpss_title}
+  							<choose>
+  								<when test="pro_num != 0">
+  									,#{pro_num}
+  								</when>
+  								<otherwise>
+  									,null
+  								</otherwise>
+  							</choose>
+  						)
+  </insert>
+  
+  <delete id="deleteSchedule" parameterType="int">
+  	DELETE FROM schedule WHERE CPSS_NUM = #{id}
+  </delete>
+  
+  <select id="proSchedule" parameterType="Integer" resultType="scheduleVo">
+  	SELECT * FROM schedule
+      WHERE pro_num = #{pro_num}
+  </select>
+  
+  </mapper>

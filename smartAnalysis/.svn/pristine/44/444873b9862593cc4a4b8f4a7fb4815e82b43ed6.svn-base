@@ -1,0 +1,217 @@
+package kr.or.ddit.consulting.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.consulting.dao.ConsultingDaoInf;
+import kr.or.ddit.consulting.model.ConsultingVo;
+
+@Service(value="consultingService")
+public class ConsultingService implements ConsultingServiceInf{
+
+	@Resource(name="consultingDao")
+	private ConsultingDaoInf consultingDao;
+	
+	/**
+	* Method : insertConsulting
+	* 최초작성일 : 2018. 9. 13.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param consultingVo
+	* @return
+	* Method 설명 : 컨설팅 신청
+	*/
+	@Override
+	public int insertConsulting(ConsultingVo consultingVo) {
+		return consultingDao.insertConsulting(consultingVo);
+	}
+
+	/**
+	* Method : cstNumConsulting
+	* 최초작성일 : 2018. 9. 14.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param cst_num
+	* @return
+	* Method 설명 : 일정번호에 맞는 컨설팅 조회(컨설턴트)
+	*/
+	@Override
+	public ConsultingVo cstNumConsulting(int cst_num) {
+		return consultingDao.cstNumConsulting(cst_num);
+	}
+	
+	/**
+	* Method : cstNumMemberConsulting
+	* 최초작성일 : 2018. 9. 18.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param cst_num
+	* @return
+	* Method 설명 : 일정번호에 맞는 컨설팅 조회(회원)
+	*/
+	@Override
+	public ConsultingVo cstNumMemberConsulting(int cst_num) {
+		return consultingDao.cstNumMemberConsulting(cst_num);
+	}
+
+
+	/**
+	* Method : consultingPageList
+	* 최초작성일 : 2018. 9. 18.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param map
+	* @return
+	* Method 설명 : 컨설팅 페이징 처리(컨설턴트)
+	*/
+	@Override
+	public Map<String, Object> consultingPageList(Map<String, Object> map) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		List<ConsultingVo> consultingPageList = consultingDao.consultingPageList(map);
+		resultMap.put("consultingPageList", consultingPageList);
+		
+		int consultCnt = consultingDao.consultingCnt();
+		resultMap.put("consultCnt", consultCnt);
+		
+		int page = (int) map.get("page");
+		int pageSize = (int) map.get("pageSize");
+		String cst_aprv = (String) map.get("cst_aprv");
+		
+		resultMap.put("consultPageNavi", makePageNavi(page, pageSize, consultCnt,cst_aprv));
+		
+		return resultMap;
+	}
+	
+	private String makePageNavi(int page, int pageSize, int consultCnt,String cst_aprv){
+		int cnt = consultCnt/pageSize;
+		int mod = consultCnt%pageSize;
+
+		if(mod>0){
+			cnt++;
+		}
+		StringBuffer pageNaviStr = new StringBuffer();
+
+		int prevPage = page ==1 ? 1: page-1;
+		int nextPage = page == cnt ? page: page+1;
+
+		pageNaviStr.append("<li><a href=\"/consulting/schedule?"
+				+ "page="
+				+ prevPage
+				+ "&pageSize="
+				+ pageSize
+				+"&cst_aprv="
+				+cst_aprv
+				+ "\" aria-label=\"Previous\"><span aria-hidden=\"true\">&laquo;</span></a></li>");
+
+		for(int i = 1; i<=cnt; i++){
+			String activeClass = "";
+			if(i==page){
+				activeClass = "class=\"active\"";
+			}
+			pageNaviStr.append("<li " + activeClass
+					+ "><a href=\"/consulting/schedule?page=" + i + "&pageSize="
+					+ pageSize+"&cst_aprv="+cst_aprv +"\">" + i + "</a></li>");
+
+		}
+		pageNaviStr.append("<li><a href=\"/consulting/schedule?"
+				+ "page="
+				+ nextPage
+				+ "&pageSize="
+				+ pageSize
+				+"&cst_aprv="
+				+cst_aprv
+				+ "\" aria-label=\"Next\"><span aria-hidden=\"true\">&raquo;</span></a></li>");
+
+		return pageNaviStr.toString();
+	}
+	
+	/**
+	* Method : consultingMemberPageList
+	* 최초작성일 : 2018. 9. 18.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param map
+	* @return
+	* Method 설명 : 컨설팅 페이징 처리(회원)
+	*/
+	@Override
+	public Map<String, Object> consultingMemberPageList(Map<String, Object> map) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		List<ConsultingVo> consultingMemberPageList = consultingDao.consultingMemberPageList(map);
+		resultMap.put("consultingMemberPageList", consultingMemberPageList);
+		
+		int consultMemCnt = consultingMemberPageList.size();
+		resultMap.put("consultMemCnt", consultMemCnt);
+		
+		int page = (int) map.get("page");
+		int pageSize = (int) map.get("pageSize");
+		String mem_id = (String) map.get("mem_id");
+		String cst_aprv = (String) map.get("cst_aprv");
+		
+		resultMap.put("consultMemPageNavi", makeMemberPageNavi(page, pageSize, consultMemCnt, mem_id, cst_aprv));
+		
+		return resultMap;
+	}
+	
+	private String makeMemberPageNavi(int page, int pageSize, int consultCnt, String mem_id, String cst_aprv){
+		int cnt = consultCnt/pageSize;
+		int mod = consultCnt%pageSize;
+
+		if(mod>0){
+			cnt++;
+		}
+		StringBuffer pageNaviStr = new StringBuffer();
+
+		int prevPage = page ==1 ? 1: page-1;
+		int nextPage = page == cnt ? page: page+1;
+
+		pageNaviStr.append("<li><a href=\"/consulting/memberConsultingCheck?"
+				+ "page="
+				+ prevPage
+				+ "&pageSize="
+				+ pageSize
+				+"&mem_id="
+				+ mem_id
+				+"&cst_aprv="
+				+cst_aprv
+				+ "\" aria-label=\"Previous\"><span aria-hidden=\"true\">&laquo;</span></a></li>");
+
+		for(int i = 1; i<=cnt; i++){
+			String activeClass = "";
+			if(i==page){
+				activeClass = "class=\"active\"";
+			}
+			pageNaviStr.append("<li " + activeClass
+					+ "><a href=\"/consulting/memberConsultingCheck?page=" + i + "&pageSize="
+					+ pageSize+"&mem_id="+mem_id+"&cst_aprv="+cst_aprv +"\">" + i + "</a></li>");
+
+		}
+		pageNaviStr.append("<li><a href=\"/consulting/memberConsultingCheck?"
+				+ "page="
+				+ nextPage
+				+ "&pageSize="
+				+ pageSize
+				+"&mem_id="
+				+ mem_id
+				+"&cst_aprv="
+				+cst_aprv
+				+ "\" aria-label=\"Next\"><span aria-hidden=\"true\">&raquo;</span></a></li>");
+
+		return pageNaviStr.toString();
+	}
+
+	@Override
+	public int consultingCnt() {
+		return consultingDao.consultingCnt();
+	}
+
+	@Override
+	public int consultingYN(int cst_num) {
+		return consultingDao.consultingYN(cst_num);
+	}
+}

@@ -1,0 +1,5 @@
+package kr.or.ddit.company.web;
+
+public class CompanyController {
+
+}

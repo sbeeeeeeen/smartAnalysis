@@ -1,0 +1,48 @@
+table{
+	width: 100%;
+}
+
+table tbody tr, td, th{
+	padding: 10px;
+	text-align: center;
+}
+
+th{
+	color: white;
+	background: #68A4C4;
+}
+
+td{
+	border-top: 1px solid #ddd;
+}
+
+table tr:hover{
+	background-color: #ddd;
+	/* cursor: pointer; */
+}
+
+.tableheader{
+	padding: 5px;
+}
+
+select{
+    box-sizing: content-box;
+    -moz-box-sizing:content-box;
+    -webkit-box-sizing:content-box;
+}
+
+.form-control{
+	height: 21px;
+}
+
+.tableheader{
+	float: right;
+}
+
+.fa{
+	font-size: 20px;
+}
+
+a{
+	color: #656565;
+}

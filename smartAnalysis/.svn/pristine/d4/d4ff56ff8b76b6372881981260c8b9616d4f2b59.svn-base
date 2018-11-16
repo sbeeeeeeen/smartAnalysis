@@ -1,0 +1,5 @@
+package kr.or.ddit.profit.web;
+
+public class ProfitController {
+
+}

@@ -1,0 +1,203 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<script type="text/javascript" src="/Moderna/js/jquery.js"></script>
+<script type="text/javascript"
+	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=e2abfa4ebad90f565e86b2265455af41&libraries=services,clusterer,drawing"></script>
+<script type="text/javascript"
+	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=e2abfa4ebad90f565e86b2265455af41"></script>
+<link
+	href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"
+	rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet">
+<div class="container">
+	<div class="page-header">
+		<h2>입지분석</h2>
+	</div>
+	<div class="row">
+		<div class="col-lg-4 b">		
+			<div class="title">[1단계]<b>  지역선택</b></div>
+			<div class="panel-body" style=" max-height: 380px;">
+				<input type="text" placeholder="주소(행정동)를 입력하세요." id="reg" class="map-search-input">
+				<button onclick="searchReg()" class="btn theme map-search-btn"><i class="fa fa-search"></i></button>
+				<p>예) 대전, 대전 중구, 은행선화동 등</p>
+				<div id="regList">
+				
+				</div>
+			</div>
+			<div class="title">[2단계]<b>  위치선택</b></div>
+			<div class="title-s">평가하려는 위치를 클릭하세요</div>
+			<hr style="border-top:solid 2px #eee; margin: 0 0 0 5px;">
+			<div style="text-align: center;">
+				<a href="/location/selectLocation" class="but" style="background:#8b99a3">초기화</a>
+				<button class="but" id="analusis" style="background: #68A4C4;">분석하기</button>
+			</div>
+		</div>
+		
+		<!-- 지도 출력 -->
+		<div class="col-lg-8" style="float: right;">
+			<div id="map" class="b"></div>
+		</div>
+	</div>
+</div>
+<form id="frm" name="frm" method="post">
+	<input type="hidden" name="id" id="id">
+</form>
+<style>
+.title{
+	color: #ffffff;
+	width: 100%;
+	padding: 15px;
+	font-size: 17px;
+	background: #68A4C4;
+}
+
+.title b{
+	color: #ffffff
+}
+
+.title-s{
+	width: 100%; 
+	text-align: center; 
+	padding: 35px;
+}
+
+.but{
+	display: inline-block;
+	height: 40px;	
+	width: 30%;
+	color: #ffffff;
+	border: 1px solid #ccc;
+	padding: 8px 10px;
+	color: white;
+	margin: 5px;
+}
+
+.but:HOVER{
+	color: #000000;
+}
+
+</style>
+<script>
+var selectAddr;
+//지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+
+var latlng; 
+var marker;
+
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+mapOption = { 
+    center: latlng = new daum.maps.LatLng(36.3250417, 127.4179621), // 지도의 중심좌표
+    level: 3 // 지도의 확대 레벨
+};
+var map = new daum.maps.Map(mapContainer, mapOption); 
+var marker = new daum.maps.Marker({ 
+    position: map.getCenter() 
+}); 
+
+if("${analysisRec}"!=""){
+	latlng = new daum.maps.LatLng("${analysisRec.AN_COORY}", "${analysisRec.AN_COORX}");
+	marker = new daum.maps.Marker({ 
+	    position: new daum.maps.LatLng("${analysisRec.AN_COORY}", "${analysisRec.AN_COORX}")
+	}); 
+}
+
+//일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+var mapTypeControl = new daum.maps.MapTypeControl();
+
+// 지도에 컨트롤을 추가해야 지도위에 표시됩니다
+// daum.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+map.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);
+
+// 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+var zoomControl = new daum.maps.ZoomControl();
+map.addControl(zoomControl, daum.maps.ControlPosition.RIGHT);
+
+// 지도에 마커를 표시합니다
+map.setCenter(latlng);
+marker.setMap(map);
+// 지도에 클릭 이벤트를 등록합니다
+// 지도를 클릭하면 마지막 파라미터로 넘어온 함수를 호출합니다
+daum.maps.event.addListener(map, 'click', function(mouseEvent) {   
+    // 클릭한 위도, 경도 정보를 가져옵니다 
+    latlng = mouseEvent.latLng; 
+    // 마커 위치를 클릭한 위치로 옮깁니다
+    marker.setPosition(latlng);
+    searchAddrFromCoords(latlng, displayCenterInfo);
+});
+var geocoder = new daum.maps.services.Geocoder();
+
+function searchAddrFromCoords(coords, callback) {
+    // 좌표로 행정동 주소 정보를 요청합니다
+    geocoder.coord2RegionCode(coords.getLng(), coords.getLat(), callback);         
+}
+
+//지도 좌측상단에 지도 중심좌표에 대한 주소정보를 표출하는 함수입니다
+function displayCenterInfo(result, status) {
+    if (status === daum.maps.services.Status.OK) {
+        var infoDiv = document.getElementById('centerAddr');
+
+        for(var i = 0; i < result.length; i++) {
+            // 행정동의 region_type 값은 'H' 이므로
+            if (result[i].region_type === 'H') {
+            	selectAddr = result[i].address_name;
+                console.log(addr);
+                break;
+            }
+        }
+    }    
+}
+
+
+	$("#analusis").on("click", function() {
+		if(selectAddr){
+			var form = document.frm;
+			form.action = "/location/analysisLocation?addr="+selectAddr+"&latlng="+latlng;
+			$("#frm").submit();
+		}else{
+			alert("위치를 선택하세요");
+		}
+		
+	});
+
+	
+	
+//주소 DB에서 검색해서 리스트 뿌려주는 메서드
+	function searchReg() {
+		var reg = document.getElementById("reg").value;
+		$.ajax({
+			url : "/map/getreg",
+			dataType : "JSON",
+			method : "post",
+			data : {
+				"reg" : encodeURI(reg)
+			},
+			success : function(data) {
+				var myHTMLStr = '<h5>총 ' + Object.keys(data).length
+						+ '건 </h5><ul class=\"regInfo\">';
+				for ( var i in data) {
+					myHTMLStr += '<li data-id=\"' + data[i]['REG_CODE'] + '\">'
+							+ data[i]['REG_NAME'] + '</li>';
+				}
+				myHTMLStr += '</ul>';
+				document.getElementById('regList').innerHTML = myHTMLStr;
+			},
+			error : function() {
+				alert("error");
+			}
+		});
+	}
+
+	//주소 검색해서 나온 리스트 클릭하면 해당 주소로 지도 옮겨주는 메서드
+	$("#regList").on("click", "li", function() {
+		var geocoder = new daum.maps.services.Geocoder();
+		var addr = $(this).text();
+		geocoder.addressSearch(addr, function(result, status) {
+			if (status === daum.maps.services.Status.OK) {
+				var coords = new daum.maps.LatLng(result[0].y, result[0].x);
+				map.setCenter(coords);
+			}
+		});
+		$("#regList").html("");
+	});
+	
+</script>

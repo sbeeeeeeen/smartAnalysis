@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	<!-- 퀵메뉴 있는 레이아웃 -->
+	<definition name="basicLayout" template="/WEB-INF/views/tiles/basicLayout.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/tiles/header.jsp" />
+		<put-attribute name="topMenu" value="/WEB-INF/views/tiles/topMenu.jsp" />
+		<put-attribute name="quickMenu" value="/WEB-INF/views/tiles/quickMenu.jsp" />
+		<put-attribute name="content" value="" />
+	</definition>
+
+	<!-- 퀵메뉴 없는 레이아웃 -->
+	<definition name="basicLayout2" template="/WEB-INF/views/tiles/basicLayout2.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/tiles/header.jsp" />
+		<put-attribute name="topMenu" value="/WEB-INF/views/tiles/topMenu.jsp" />
+		<put-attribute name="content" value="" />
+	</definition>
+
+	<!-- 메인 컨텐츠 -->
+	<definition name="smartMain" extends="basicLayout">
+		<put-attribute name="content" value="/WEB-INF/views/content/container.jsp" />
+	</definition>
+
+	<!-- 로그인 -->
+	<definition name="login" extends="basicLayout2">
+		<put-attribute name="content" value="/WEB-INF/views/content/login.jsp" />
+	</definition>
+
+	<!-- 마이페이지 -->
+	<definition name="mypage" extends="basicLayout2">
+		<put-attribute name="content" value="/WEB-INF/views/content/mypage.jsp" />
+	</definition>
+	
+	<!-- 아이디찾기 -->
+	<definition name="findId" extends="basicLayout2">
+		<put-attribute name="content" value="/WEB-INF/views/content/findId.jsp" />
+	</definition>
+	
+	<!-- 비밀번호 찾기 -->
+	<definition name="findPw" extends="basicLayout2">
+		<put-attribute name="content" value="/WEB-INF/views/content/findPw.jsp" />
+	</definition>
+	
+	<!-- 회원가입 -->
+	<definition name="join" extends="basicLayout2">
+		<put-attribute name="content" value="/WEB-INF/views/content/join.jsp" />
+	</definition>
+
+	<!-- 활용현황 -->
+	<definition name="utilization" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/utilization/utilization.jsp" />
+	</definition>
+
+	<!-- 상권분석 검색 -->
+	<definition name="taSelect" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/tradeAnalysis/taSelect.jsp" />
+	</definition>
+
+	<!-- 상권분석 보고서 -->
+	<definition name="taResult" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/tradeAnalysis/taResult.jsp" />
+	</definition>
+
+	<!-- 공지사항 -->
+	<definition name="noticeBoard" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/board/noticeBoard.jsp" />
+	</definition>
+
+	<!-- 협동조합 -->
+	<definition name="copartnershipMain" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/copartnership/copartnershipMain.jsp" />
+	</definition>
+
+	<!-- 협동조합선택 -->
+	<definition name="copartnershipDetail" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/copartnership/copartnershipDetail.jsp"></put-attribute>
+	</definition>
+
+	<!-- 공지사항 글 상세내용 -->
+	<definition name="detailPost" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/board/detailPost.jsp" />
+	</definition>
+
+	<!-- 게시글 상세내용 -->
+	<definition name="copartnershipPostdetail" extends="basicLayout">
+		<put-attribute name="content" value="/WEB-INF/views/board/copartnershipPostdetail.jsp" />
+	</definition>
+	
+	<!-- 컨설팅 -->
+	<definition name="consulting" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/consulting/consulting.jsp" />
+	</definition>
+
+	<!-- 분석이력 -->
+	<definition name="tradeAnalysisRes" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/tradeAnalysisRes/tradeAnalysisResMain.jsp" />
+	</definition>
+
+	<!-- 업종활용현황 -->
+	<definition name="upzongUilization" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/utilization/upzongUilization.jsp" />
+	</definition>
+
+	<!-- 미래지향 -->
+	<definition name="future" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/future/futureAnalysis.jsp" />
+	</definition>
+
+	<!-- 미래지향결과 -->
+	<definition name="futureResult" extends="basicLayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/future/futureResult.jsp" />
+	</definition>
+
+</tiles-definitions>

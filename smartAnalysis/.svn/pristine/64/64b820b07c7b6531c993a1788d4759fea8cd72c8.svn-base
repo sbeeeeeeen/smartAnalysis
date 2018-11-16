@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cooperative">
+
+	<select id="getCooperativeList" resultType="cooperativeVo" parameterType="int">
+		SELECT COOP_NUM, COOP_DIV,(SELECT MEM_NAME
+									FROM MEMBER
+									WHERE MEM_ID = a.MEM_ID) as MEM_ID
+		FROM cooperative a
+		WHERE CSHIP_NUM = #{cship_num} and a.coop_div not in('0', '3')
+		ORDER BY DECODE(a.COOP_DIV, '2', 1, 2)
+	</select>
+
+	<update id="deleteCooperative" parameterType="cooperativeVo">
+		UPDATE cooperative SET coop_div = '0'
+		WHERE coop_num = #{coop_num}
+	</update>
+	
+	<insert id="insertCooperative" parameterType="cooperativeVo">
+		insert into cooperative values(coop_num.nextval, #{mem_id}, #{coop_div}, #{cship_num})
+	</insert>
+	
+	<select id="getCooperative" parameterType="map" resultType="cooperativeVo">
+		SELECT *
+		FROM cooperative
+		WHERE mem_id=#{mem_id} and cship_num=#{cship_num} and coop_div!=0
+	</select>
+	
+	<select id="getStandbyCooperative" parameterType="int" resultType="memberVo">
+		SELECT m.mem_id as mem_id
+			, m.mem_email as mem_email
+			, m.mem_name as mem_name
+			, m.mem_call as mem_call
+			, m.mem_add as mem_add
+			, (SELECT ind_s 
+				FROM industry 
+				WHERE ind_code=m.ind_code) as ind_code
+    	FROM member m
+	    WHERE mem_id IN (SELECT mem_id 
+	    				FROM cooperative 
+	    				WHERE cship_num=#{cship_num}
+	    				AND coop_div=3)
+	</select>
+
+	<update id="updateCooperative" parameterType="cooperativeVo">
+		UPDATE cooperative SET coop_div = #{coop_div}
+		WHERE coop_num=(select max(coop_num) from cooperative where mem_id=#{mem_id} and cship_num=#{cship_num}) 
+	</update>
+	
+	<select id="getCooperativeMemberVo" resultType="memberVo" parameterType="int">
+		SELECT m.mem_id as mem_id
+			, m.mem_email as mem_email
+			, m.mem_name as mem_name
+			, m.mem_call as mem_call
+			, m.mem_add as mem_add
+			, (SELECT ind_s 
+				FROM industry 
+				WHERE ind_code=m.ind_code) as ind_code
+    	FROM member m
+		WHERE mem_id = (SELECT mem_id
+						FROM cooperative
+						WHERE coop_num=#{coop_num})
+	</select>
+</mapper>

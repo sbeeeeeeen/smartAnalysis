@@ -1,0 +1,56 @@
+package kr.or.ddit.future.web;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import kr.or.ddit.industry.model.IndustryVo;
+import kr.or.ddit.industry.service.IndustryServiceInf;
+import kr.or.ddit.region.service.RegionServiceInf;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+@RequestMapping("/future")
+@Controller("futureController")
+public class FutureController {
+
+	@Resource(name = "regionService")
+	private RegionServiceInf regionService;
+
+	@Resource(name = "industryService")
+	private IndustryServiceInf industryService;
+
+	// 미래지향 메인창, 대분류 보여줄수있음.
+	@RequestMapping(value = "/view")
+	public ModelAndView view() {
+
+		ModelAndView mav = new ModelAndView("future");
+
+		List<IndustryVo> Ind_lList = industryService.getInd_L();
+		mav.addObject("Ind_lList", Ind_lList);
+
+		return mav;
+
+	}
+
+	// 업종 중분류 선택
+	@RequestMapping("/ind_l")
+	public ModelAndView ind_lView(@RequestParam(value = "ind_l") String ind_l) {
+
+		ModelAndView mav = new ModelAndView("jsonView");
+
+		List<IndustryVo> Ind_mList = industryService.getIndustryM(ind_l);
+		mav.addObject("Ind_mList", Ind_mList);
+
+		return mav;
+	}
+
+	@RequestMapping("/result")
+	public String result() {
+		return "futureResult";
+	}
+
+}

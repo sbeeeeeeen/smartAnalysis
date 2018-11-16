@@ -1,0 +1,170 @@
+package kr.or.ddit.copartnership.web;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import kr.or.ddit.cooperative.model.CooperativeVo;
+import kr.or.ddit.cooperative.service.CooperativeServiceInf;
+import kr.or.ddit.copartnership.model.CopartnershipVo;
+import kr.or.ddit.copartnership.service.CopartnershipServiceInf;
+import kr.or.ddit.industry.model.IndustryVo;
+import kr.or.ddit.industry.service.IndustryServiceInf;
+import kr.or.ddit.schedule.model.ScheduleVo;
+import kr.or.ddit.schedule.service.ScheduleServiceInf;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+@RequestMapping("/copartnership")
+@Controller("copartnershipController")
+public class CopartnershipController {
+	
+	@Resource(name="copartnershipService")
+	CopartnershipServiceInf copartnershipService;
+	
+	@Resource(name="industryService")
+	IndustryServiceInf industryService;
+	
+	@Resource(name="cooperativeService")
+	CooperativeServiceInf cooperativeService;
+	
+	@Resource(name="scheduleService")
+	ScheduleServiceInf scheduleService;
+	
+	@RequestMapping("/main")
+	public String copartnershipList(@RequestParam(value="page", defaultValue="1")int page,
+									@RequestParam(value="pageSize", defaultValue="10")int pageSize,
+									@RequestParam(value="search", defaultValue="")String search,
+									Model model) throws UnsupportedEncodingException{
+		search = new String(search.getBytes("8859_1"),"UTF-8");
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("search", search);
+		
+		Map<String, Object> resultMap = copartnershipService.getCopartnershipPageList(paramMap);
+		List<IndustryVo> industry = industryService.getInd_L();
+		
+		model.addAllAttributes(resultMap);
+		model.addAttribute("industry", industry);
+		
+		return "copartnershipMain";
+	}
+	
+	
+	
+	@RequestMapping("/searchCopartnershipList")
+	public ModelAndView searchCopartnershipList(@RequestParam(value="page", defaultValue="1")int page,
+												@RequestParam(value="pageSize", defaultValue="10")int pageSize,
+												@RequestParam String search) throws UnsupportedEncodingException{
+		ModelAndView mv = new ModelAndView("jsonView");
+		search = URLDecoder.decode(search, "UTF-8");
+		
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("search", search);
+		
+		Map<String, Object> resultMap = copartnershipService.getCopartnershipPageList(paramMap);
+		
+		
+		mv.addObject("resultMap", resultMap);
+		return mv;
+	}
+	
+	@RequestMapping("/detailCopartnership")
+	public String detailCopartnership(@RequestParam(value="id")int id,
+									  Model model){
+		
+		CopartnershipVo copartnership = copartnershipService.getOneCopartnership(id);
+		List<CooperativeVo> cooperativeList = cooperativeService.getCooperativeList(id);
+		List<ScheduleVo> scheduleList = scheduleService.getSchedule(id);
+		
+		model.addAttribute("scheduleList", scheduleList);
+		model.addAttribute("cooperativeList", cooperativeList);
+		model.addAttribute("copartnership", copartnership);
+		
+		return "copartnershipDetail";
+	}
+	
+	
+	@RequestMapping("/searchSchedule")
+	public ModelAndView searchSchedule(@RequestParam(value="id")int id,
+									   @RequestParam(value="scheduleID", defaultValue="0")int scheduleID){
+		if(scheduleID != 0){
+			int cnt = scheduleService.deleteSchedule(scheduleID);
+			System.out.println(cnt);
+		}
+		
+		
+		ModelAndView mv = new ModelAndView("jsonView");
+		List<ScheduleVo> scheduleList = scheduleService.getSchedule(id);
+		
+		mv.addObject("scheduleList", scheduleList);
+		
+		return mv;
+	}
+	
+	@RequestMapping("/inputSchedule")
+	public ModelAndView inputSchedule(ScheduleVo scheduleVo,
+									  @RequestParam(value="start")String start,
+									  @RequestParam(value="end")String end) throws ParseException, UnsupportedEncodingException{
+		ModelAndView mv = new ModelAndView("jsonView");
+		scheduleVo.setCpss_title(URLDecoder.decode(scheduleVo.getCpss_title(), "UTF-8"));
+		scheduleVo.setCpss_content(URLDecoder.decode(scheduleVo.getCpss_content(), "UTF-8"));
+		start = start.replace("\"", "");
+		end = end.replace("\"", "");
+		String[] start_split = start.split("T");
+		String[] end_split = end.split("T");
+		
+		String[] start_split1 = start_split[1].split("\\.");
+		String[] end_split1 = end_split[1].split("\\.");
+		
+		String start_dt = start_split[0] + " " + start_split1[0];
+		String end_dt = end_split[0] + " " + end_split1[0];
+		
+		Date sdt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(start_dt);
+		Date edt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(end_dt);
+		
+		scheduleVo.setCpss_Sdt(sdt);
+		scheduleVo.setCpss_Edt(edt);
+		
+		
+		scheduleService.insertSchedule(scheduleVo);
+		mv.addObject(scheduleVo);
+		return mv;
+		
+	}
+	
+	@RequestMapping("/delectCooperative")
+	public ModelAndView deleteCoopartnership(@RequestParam(value="cooperID")int cooper_id,
+											 @RequestParam(value="id")int id){
+		
+		ModelAndView mv = new ModelAndView("jsonView");
+		cooperativeService.deleteCooperative(cooper_id);
+		
+		List<CooperativeVo> cooperativeList = cooperativeService.getCooperativeList(id);
+		
+		mv.addObject("cooperativeList", cooperativeList);
+		
+		return mv;
+	}
+	
+	
+	
+	
+	
+	
+	
+}

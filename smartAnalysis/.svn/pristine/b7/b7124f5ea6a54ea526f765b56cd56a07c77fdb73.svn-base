@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="residential">
+	<select id="getResidentialVo" parameterType="long" resultType="residentialVo">
+		SELECT sum(rst_count) RST_COUNT
+		FROM residential
+		WHERE
+		reg_code=#{reg_code} AND rst_div=1
+	</select>
+
+	<select id="getResidential" parameterType="map" resultType="residentialVo">
+		select rst_age, rst_count
+		from RESIDENTIAL
+		where reg_code=#{reg_code}
+		and rst_div = #{rst_div}
+		order by RST_AGE ASC
+	</select>
+
+	<select id="getResidentialAgeList" parameterType="long"
+		resultType="residentialVo">
+		select DISTINCT rst_age
+		from RESIDENTIAL
+		where
+		reg_code=#{reg_code} order by
+		RST_AGE
+	</select>
+
+	<select id="getMaxAge" parameterType="long" resultType="int">
+		SELECT
+		rst_age
+		FROM (select rst_age, rst_count, rst_div from RESIDENTIAL
+		where
+		reg_code=#{reg_code} and rst_div = 1
+		ORDER BY rst_count desc)
+		where
+		ROWNUM = 1
+	</select>
+
+	<select id="getMaxDiv" parameterType="long" resultType="int">
+		SELECT
+		rst_div
+		FROM (select rst_age, rst_count, rst_div from RESIDENTIAL
+		where
+		reg_code=#{reg_code} and rst_div != 1
+		ORDER BY rst_count desc)
+		where
+		ROWNUM = 1
+	</select>
+
+</mapper>

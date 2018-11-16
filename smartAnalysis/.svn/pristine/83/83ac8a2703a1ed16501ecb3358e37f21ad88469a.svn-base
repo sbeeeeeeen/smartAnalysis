@@ -1,0 +1,19 @@
+package kr.or.ddit.residential.dao;
+
+import javax.annotation.Resource;
+
+import kr.or.ddit.residential.model.ResidentialVo;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class ResidentialDao implements ResidentialDaoInf{
+	@Resource(name="sqlSessionTemplate")
+	SqlSessionTemplate template;
+
+	@Override
+	public ResidentialVo getResidentialVo(long reg_code) {
+		return template.selectOne("getResidentialVo", reg_code);
+	}
+}

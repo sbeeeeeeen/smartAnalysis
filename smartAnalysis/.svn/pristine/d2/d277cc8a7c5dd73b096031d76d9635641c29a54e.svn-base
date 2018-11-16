@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="utilization">
+
+<!-- 상반기 지역현황 가져오기 -->
+<select id="getUtilSang" resultType="utilVo" parameterType="long">
+
+	    SELECT A.REG_CODE
+	     , (SELECT R.REG_DONG FROM REGION R WHERE R.REG_CODE = A.REG_CODE) REG_DONG
+	     , A.IND_CODE
+	     , (SELECT I.IND_M FROM INDUSTRY I WHERE I.IND_CODE = A.IND_CODE) IND_M
+	     , A.CNT
+       , A.an_dt
+	FROM
+	(
+	  SELECT AR.REG_CODE
+	       , AR.IND_CODE
+	       , COUNT(*) CNT
+         , AR.AN_DT
+	  FROM ANALYSIS_CODE AR
+	  where AR.REG_CODE = #{REG_CODE} and AR.AN_DT BETWEEN TO_DATE('18/03/01','YY/MM/DD') AND TO_DATE('18/08/31','YY/MM/DD')
+	GROUP BY (AR.REG_CODE, AR.IND_CODE, AR.AN_DT)
+	) A ORDER BY CNT DESC
+</select>
+
+<!-- 하반기 지역현황 가져오기 -->
+<select id="getUtilHa" resultType="utilVo" parameterType="long">
+
+	    SELECT A.REG_CODE
+	     , (SELECT R.REG_DONG FROM REGION R WHERE R.REG_CODE = A.REG_CODE) REG_DONG
+	     , A.IND_CODE
+	     , (SELECT I.IND_M FROM INDUSTRY I WHERE I.IND_CODE = A.IND_CODE) IND_M
+	     , A.CNT
+       , A.an_dt
+	FROM
+	(
+	  SELECT AR.REG_CODE
+	       , AR.IND_CODE
+	       , COUNT(*) CNT
+         , AR.AN_DT
+	  FROM   ANALYSIS_CODE AR
+	  where AR.REG_CODE = #{REG_CODE} and AR.AN_DT BETWEEN TO_DATE('18/09/01','YY/MM/DD') AND TO_DATE('19/02/28','YY/MM/DD')
+	GROUP BY (AR.REG_CODE, AR.IND_CODE, AR.AN_DT)
+	) A ORDER BY CNT DESC
+	
+</select>
+
+<!-- 상반기 업종현황 가져오기 -->
+<select id="getUpzongSang" resultType="utilVo" parameterType="string">
+   SELECT A.REG_CODE 
+	     , (SELECT R.REG_DONG FROM REGION R WHERE R.REG_CODE = A.REG_CODE) REG_DONG
+       , (SELECT R.REG_GU FROM REGION R WHERE R.REG_CODE = A.REG_CODE) REG_GU
+	     , (SELECT DISTINCT I.IND_MCODE FROM INDUSTRY I WHERE I.IND_MCODE = A.IND_MCODE) IND_MCODE
+	     , (SELECT DISTINCT I.IND_M FROM INDUSTRY I WHERE I.IND_MCODE = A.IND_MCODE) IND_M
+	     , A.CNT
+       , A.an_dt
+	FROM
+	(
+   SELECT AR.REG_CODE
+	       , AR.IND_MCODE
+         , AR.AN_DT
+	       , COUNT(*) CNT
+    FROM   ANALYSIS_CODE AR
+	  where AR.IND_MCODE = #{IND_MCODE} and AR.AN_DT BETWEEN TO_DATE('18/03/01','YY/MM/DD') AND TO_DATE('18/08/31','YY/MM/DD')
+	  GROUP BY (AR.REG_CODE, AR.IND_MCODE, AR.AN_DT)
+	) A 
+	
+	ORDER BY CNT DESC
+</select>
+
+<!-- 하반기 업종현황 가져오기 -->
+<select id="getUpzongHa" resultType="utilVo" parameterType="string">
+  SELECT A.REG_CODE 
+	     , (SELECT R.REG_DONG FROM REGION R WHERE R.REG_CODE = A.REG_CODE) REG_DONG
+       , (SELECT R.REG_GU FROM REGION R WHERE R.REG_CODE = A.REG_CODE) REG_GU
+	     , (SELECT DISTINCT I.IND_MCODE FROM INDUSTRY I WHERE I.IND_MCODE = A.IND_MCODE) IND_MCODE
+	     , (SELECT DISTINCT I.IND_M FROM INDUSTRY I WHERE I.IND_MCODE = A.IND_MCODE) IND_M
+	     , A.CNT
+       , A.an_dt
+	FROM
+	(
+   SELECT AR.REG_CODE
+	       , AR.IND_MCODE
+         , AR.AN_DT
+	       , COUNT(*) CNT
+    FROM   ANALYSIS_CODE AR
+	  where AR.IND_MCODE = #{IND_MCODE} and AR.AN_DT BETWEEN TO_DATE('18/09/01','YY/MM/DD') AND TO_DATE('19/02/28','YY/MM/DD')
+	  GROUP BY (AR.REG_CODE, AR.IND_MCODE, AR.AN_DT)
+	) A ORDER BY CNT DESC
+</select>
+
+</mapper>

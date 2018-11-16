@@ -1,0 +1,26 @@
+package kr.or.ddit.analysis_res.model;
+
+
+public class StoreVo {
+	/*private int[] storeCnt; //음식/생활서비스/소매/선택업종
+	private Map<String, Integer> IndustryCnt;*/
+	private String industryM;
+	private int industryCnt;
+	
+	public String getIndustryM() {
+		return industryM;
+	}
+	public void setIndustryM(String industryM) {
+		this.industryM = industryM;
+	}
+	public int getIndustryCnt() {
+		return industryCnt;
+	}
+	public void setIndustryCnt(int industryCnt) {
+		this.industryCnt = industryCnt;
+	}
+	
+	
+	
+	
+}

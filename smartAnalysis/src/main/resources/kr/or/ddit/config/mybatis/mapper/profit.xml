@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="profit">
+  
+  <!-- 비용입력값 추가 -->
+  <insert id="insertProfit" parameterType="profitVo">
+  	INSERT INTO PROFIT (PR_NUM, PR_MJ, PR_SMJ, PR_GLPAY, PR_BJPAY, PR_AM, PR_EJ, PR_BDPAY,
+  						PR_INTE, PR_SBPAY, PR_MEM, PR_OTPAY, PR_PERI, PR_RTPAY, PR_INGUN,
+  						PR_MTPAY, PR_OPPAY, PR_AVPAY, AN_NUM)
+  	VALUES (PRNUM_SEQ.NEXTVAL, #{PR_MJ}, #{PR_SMJ}, #{PR_GLPAY}, #{PR_BJPAY}, #{PR_AM}, #{PR_EJ}, #{PR_BDPAY},
+  						#{PR_INTE}, #{PR_SBPAY}, #{PR_MEM}, #{PR_OTPAY}, #{PR_PERI}, #{PR_RTPAY}, #{PR_INGUN},
+  						#{PR_MTPAY}, #{PR_OPPAY}, #{PR_AVPAY}, #{AN_NUM})
+  </insert>
+  
+  <!-- 분석번호로 profitVo 조회 -->
+  <select id="getProfit" resultType="profitVo" parameterType="Integer">
+	select *
+	from profit
+	where AN_NUM=#{AN_NUM}
+  </select>
+  
+  </mapper>

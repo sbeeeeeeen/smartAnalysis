@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="facility">
+
+	<!-- 학교뽑기 -->
+	<select id="getSchool" resultType="facilityVo" parameterType="int">
+		select * from facility WHERE reg_gucode = #{reg_gucode} and faci_div
+		BETWEEN 1 AND 7 order by faci_div
+	</select>
+
+	<!-- 나머지 시설 뽑기 -->
+	<select id="getFacility" resultType="facilityVo" parameterType="int">
+		select * from facility WHERE reg_gucode = #{reg_gucode} and faci_div
+		BETWEEN 8 AND 11 order by faci_div
+	</select>
+
+	<select id="getFaci_nm" resultType="String" parameterType="int">
+		select faci_nm from ( select FACI_NM, FACI_CNT
+		from FACILITY
+		where REG_GUCODE=#{reg_gucode}
+		order by FACI_CNT desc)
+		where ROWNUM = 1
+	</select>
+
+</mapper>

@@ -1,0 +1,13 @@
+package kr.or.ddit.rating.dao;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.rating.model.RatingVo;
+
+public interface RatingDaoInf {
+	public List<RatingVo> getdongRatingList(int an_num);
+	public List<RatingVo> getguRatingList(int an_num);
+	public List<RatingVo> getsiRatingList(int an_num);
+}

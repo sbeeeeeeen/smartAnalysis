@@ -1,0 +1,5 @@
+package kr.or.ddit.company.service;
+
+public class CompanyService implements CompanyServiceInf {
+
+}

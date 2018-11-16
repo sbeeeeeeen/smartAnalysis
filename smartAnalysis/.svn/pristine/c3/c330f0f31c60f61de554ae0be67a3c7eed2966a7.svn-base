@@ -1,0 +1,77 @@
+package kr.or.ddit.analysis_res.service;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.analysis_res.model.AnalysisCodeVo;
+import kr.or.ddit.analysis_res.model.AnalysisRecVo;
+import kr.or.ddit.analysis_res.model.AnalysisResVo;
+
+public interface AnalysisResServiceInf {
+	/**
+	 * Method : insertAnalysisRes
+	 * 최초작성일 : 2018. 9. 10.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param arVo
+	 * @return
+	 * Method 설명 : insert
+	 */
+	public int insertAnalysisRes(AnalysisResVo anVo);
+	
+	/**
+	 * Method : insertAnalysisRec
+	 * 최초작성일 : 2018. 9. 10.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param arVo
+	 * @return
+	 * Method 설명 : insert
+	 */
+	public int insertAnalysisRec(AnalysisRecVo arVo);
+	
+	/**
+	 * Method : insertAnalysisCode
+	 * 최초작성일 : 2018. 9. 10.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param data
+	 * @return
+	 * Method 설명 : insert 지역/업종 카운트 +1하고 지역코드 가져옴
+	 */
+	public long insertAnalysisCode(Map<String, Object> data);
+	
+	/**
+	 * Method : getAnalysisVos
+	 * 최초작성일 : 2018. 9. 10.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param an_num
+	 * @return
+	 * Method 설명 : vo 두개(analysis rec/res) 맵으로 가져옴
+	 */
+	public Map<String, Object> getAnalysisVos(int an_num);
+	
+	/**
+	 * Method : getAnalysisCodeVo
+	 * 최초작성일 : 2018. 9. 13.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param an_num
+	 * @return
+	 * Method 설명 : codeVo는 xml 파싱하는데 쓸거라서 따로
+	 */
+	public List<AnalysisCodeVo> getAnalysisCodeVo(int an_num);
+	
+	/**
+	 * Method : getAnalysisResList
+	 * 최초작성일 : 2018. 9. 11.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param data
+	 * @return
+	 * Method 설명 : 리스트, 페이지네이션 가져오기
+	 */
+	public Map<String, Object> getAnalysisResList(Map<String, Object> data);
+	
+}

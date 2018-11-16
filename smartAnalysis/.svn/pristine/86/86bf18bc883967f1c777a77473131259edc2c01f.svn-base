@@ -1,0 +1,66 @@
+<%@page import="kr.or.ddit.member.model.MemberVo"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<%
+   		MemberVo memberVo = (MemberVo)session.getAttribute("memberVo");
+    %>
+    <fieldset>
+        <textarea id="messageWindow" rows="10" cols="50" readonly="true"></textarea>
+        <br/>
+        <input id="inputMessage" type="text" onkeyup="enterkey()"/>
+        <input type="submit" value="send" onclick="send()" />
+        <input id="userId" type="hidden" value="<%=memberVo.getMem_id()%>"/> 
+    </fieldset>
+</body>
+    <script type="text/javascript">
+        var textarea = document.getElementById("messageWindow");
+        var webSocket = new WebSocket('ws://192.168.207.139:8180/chat');
+        var inputMessage = document.getElementById('inputMessage');
+        var userId = document.getElementById('userId').value;
+    webSocket.onerror = function(event) {
+      onError(event)
+    };
+    webSocket.onopen = function(event) {
+      onOpen(event)
+    };
+    webSocket.onmessage = function(event) {
+      onMessage(event)
+    };
+    webSocket.onclose = function (event) {      
+        webSocket.close();
+    };
+    
+    function onMessage(event) {
+        textarea.value += "상대 : " + event.data + "\n";
+    }
+    function onOpen(event) {
+        textarea.value += "채팅에 참여하였습니다\n";
+    }
+    function onError(event) {
+      alert(event.data);
+    }
+    function send() {
+        textarea.value += userId+" : "+inputMessage.value + "\n";
+        webSocket.send(inputMessage.value);
+        inputMessage.value = "";
+    }
+    //엔터키를 통해 send함
+    function enterkey(){
+    	if(window.event.keyCode==13){
+    		send();
+    	}
+    }
+    //채팅 내용 많아지면 자동으로 스크롤바 내려가게 함
+    window.setInterval(function() {
+        var elem = document.getElementById('messageWindow');
+        elem.scrollTop = elem.scrollHeight;
+    }, 0);
+  </script>
+</html>

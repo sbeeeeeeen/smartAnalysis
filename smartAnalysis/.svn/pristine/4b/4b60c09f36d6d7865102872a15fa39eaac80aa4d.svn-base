@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="pro">
+  	<select id="proNumSelect" parameterType="Integer" resultType="proVo">
+  		SELECT * FROM pro
+  			WHERE pro_num=#{pro_num}
+  	</select>
+  	
+  	<select id="proList" resultType="proVo">
+  		  SELECT pro_cost, pro_num, pro_intro,(
+  		  								SELECT mem_name
+                                          FROM member
+                                         WHERE a.mem_id = mem_id) AS mem_id
+ 				 FROM pro a
+  	</select>
+  	
+  	<select id="proMember" parameterType="String" resultType="proVo">
+  		SELECT * 
+  			FROM pro
+    	WHERE mem_id=#{mem_id}
+  	</select>
+  </mapper>

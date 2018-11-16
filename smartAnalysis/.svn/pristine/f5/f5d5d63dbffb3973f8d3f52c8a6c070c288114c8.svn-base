@@ -1,0 +1,45 @@
+package kr.or.ddit.guide.model;
+
+public class GuideVo {
+
+	private int gu_num;
+	private String mem_id;
+	private String gu_content;
+	private int file_num;
+	
+	public GuideVo(){
+		
+	}
+	
+	public int getGu_num() {
+		return gu_num;
+	}
+	public void setGu_num(int gu_num) {
+		this.gu_num = gu_num;
+	}
+	public String getMem_id() {
+		return mem_id;
+	}
+	public void setMem_id(String mem_id) {
+		this.mem_id = mem_id;
+	}
+	public String getGu_content() {
+		return gu_content;
+	}
+	public void setGu_content(String gu_content) {
+		this.gu_content = gu_content;
+	}
+	public int getFile_num() {
+		return file_num;
+	}
+	public void setFile_num(int file_num) {
+		this.file_num = file_num;
+	}
+
+	@Override
+	public String toString() {
+		return "GuideVo [gu_num=" + gu_num + ", mem_id=" + mem_id
+				+ ", gu_content=" + gu_content + ", file_num=" + file_num + "]";
+	}
+
+}

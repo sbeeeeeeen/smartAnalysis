@@ -1,0 +1,139 @@
+h3{
+	color: #68A4C4;
+	margin-bottom: 30px;
+	padding-top: 30px;
+}
+
+table{
+	border: 1px solid #ccc;
+	border-collapse: collapse;
+}
+
+
+.table .table-info{
+	width:100%;
+}
+
+.table thead{
+	color: #ffffff;
+	background: #2e2e2e;
+}
+
+.table tbody{
+	color: #666666;
+	background: #ffffff;
+}
+
+
+.table thead tr th{
+	vertical-align: middle;
+	border-bottom: 0;
+	padding: 10px 8px;
+}
+
+.table tbody tr td{
+	vertical-align: middle;
+	padding: 15px 8px;
+}
+
+.table tbody tr th{
+	vertical-align: middle;
+}
+
+th, td{
+	text-align: center;
+	border: 1px solid #ccc;
+	
+}
+.up{
+	color: #ff0000;
+}
+.down{
+	color: #0000fd;
+}
+
+.industryDiv{
+	height: 100%;
+	width: 580px;
+	float: left;
+}
+
+.helpwrap{
+	background-color: #f5f6f1;
+    padding: 20px 17px;
+    margin-top: 20px;
+}
+
+.helpwrap em{
+	float: left;
+    display: inline-block;
+    width: 56px;
+    height: 18px;
+    margin-top: 3px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding-left: 9px;
+    padding-top: 1px;
+    font-style: normal;
+    margin: 0;
+    line-height: 150%;
+    background: #999999;
+}
+
+.helpwrap ul{
+	display: inline-block;
+    font-size: 13px;
+    max-width: 885px;
+    color: black;
+}
+
+.helpwrap ul li{
+    padding: 3px 0 3px 13px;
+    line-height: 150%;
+}
+
+.resultwrap{
+	clear: both;
+	border-top: 2px solid #68A4C4;
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    padding: 20px 0;
+    display: table;
+    width: 100%;
+    line-height: 160%;
+    margin: 20px 0;
+}
+
+.resultwrap .col:nth-child(1){
+	text-align: center;
+    width: 180px;
+    font-size: 18px;
+    padding: 0;
+}
+
+.resultwrap .col strong{
+	color: #3c64db;
+	font-size: 17px;
+}
+
+.resultwrap .col{
+	float: left;
+	height: 45px;
+}
+
+.resultwrap .col:nth-child(2){
+	line-height: 40px;
+}
+
+.largenum{
+	font-size: 15px;
+}
+
+.bgpoint{
+	background-color: #ecf8fd;	
+}
+
+.bgpoint2{
+	background-color: #f9f9f9;
+}

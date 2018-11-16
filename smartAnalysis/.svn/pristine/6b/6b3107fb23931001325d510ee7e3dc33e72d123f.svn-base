@@ -1,0 +1,36 @@
+package kr.or.ddit.cooperative.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.cooperative.model.CooperativeVo;
+
+public interface CooperativeDaoInf {
+	
+
+	/**
+	* Method : getCooperativeList
+	* 최초작성일 : 2018. 9. 4.
+	* 작성자 : user
+	* 변경이력 :
+	* @param cship_num
+	* @return
+	* Method 설명 : 협동조합원 조회
+	*/
+	List<CooperativeVo> getCooperativeList(int cship_num);
+
+	int deleteCooperative(int coop_num);
+	
+	int insertCooperative(CooperativeVo cooperativeVo);
+	
+	/**
+	 * Method : getCooperativeVo
+	 * 최초작성일 : 2018. 9. 21.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param data
+	 * @return
+	 * Method 설명 : 협동조합원 정보 조회
+	 */
+	CooperativeVo getCooperativeVo(Map<String, Object> data);
+}

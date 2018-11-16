@@ -1,0 +1,88 @@
+package kr.or.ddit.cooperative.service;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.cooperative.model.CooperativeVo;
+import kr.or.ddit.member.model.MemberVo;
+
+public interface CooperativeServiceInf {
+
+	/**
+	* Method : getCooperativeList
+	* 최초작성일 : 2018. 9. 4.
+	* 작성자 : user
+	* 변경이력 :
+	* @param cship_num
+	* @return
+	* Method 설명 : 협동조합원 조회
+	*/
+	List<CooperativeVo> getCooperativeList(int cship_num);
+
+	/**
+	* Method : deleteCooperative
+	* 최초작성일 : 2018. 9. 10.
+	* 작성자 : user
+	* 변경이력 :
+	* @param id
+	* @return
+	* Method 설명 : 협동조합원 강퇴
+	*/
+	int deleteCooperative(int coop_num);
+
+	/**
+	 * Method : insertCooperative
+	 * 최초작성일 : 2018. 9. 18.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param cooperativeVo
+	 * @return
+	 * Method 설명 : 회원 insert
+	 */
+	int insertCooperative(CooperativeVo cooperativeVo);
+	
+	/**
+	 * Method : getCooperativeVo
+	 * 최초작성일 : 2018. 9. 21.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param data
+	 * @return
+	 * Method 설명 : 협동조합원 정보 조회
+	 */
+	CooperativeVo getCooperativeVo(Map<String, Object> data);
+	
+	/**
+	 * Method : getStandbyCooperative
+	 * 최초작성일 : 2018. 9. 27.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param cship_num
+	 * @return
+	 * Method 설명 : 협동조합 승인 대기중인 회원 리스트
+	 */
+	List<MemberVo> getStandbyCooperative(int cship_num);
+	
+	/**
+	 * Method : updateCooperative
+	 * 최초작성일 : 2018. 9. 27.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param CooperativeVo
+	 * @return
+	 * Method 설명 : 가입 신청한 회원 승인하기
+	 */
+	int updateCooperative(CooperativeVo cooperative);
+	
+	/**
+	 * Method : getCooperativeMemberVo
+	 * 최초작성일 : 2018. 9. 27.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param coop_num
+	 * @return
+	 * Method 설명 : 협원번호에 해당하는 회원 VO 가져오기
+	 */
+	MemberVo getCooperativeMemberVo(int coop_num);
+	
+}

@@ -1,0 +1,5 @@
+package kr.or.ddit.pro.service;
+
+public interface ProServiceInf {
+
+}

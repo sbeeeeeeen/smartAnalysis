@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="guide">
+
+	<!-- 전체 가이드 정보 조회 -->
+	<select id="selectAllGuide" resultType="guideVo">
+		select * from guide
+	</select>
+
+	<!-- 가이드번호로 조회 -->
+	<select id="selectOneGuide" resultType="guideVo" parameterType="int">
+		select * from guide where gu_num = #{gu_num}
+	</select>
+
+</mapper>

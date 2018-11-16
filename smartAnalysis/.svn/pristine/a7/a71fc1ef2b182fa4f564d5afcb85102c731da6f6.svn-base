@@ -1,0 +1,326 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<script type="text/javascript" src="/Moderna/js/jquery.js"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=e2abfa4ebad90f565e86b2265455af41&libraries=services,clusterer,drawing"></script>
+<script type="text/javascript"
+	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=e2abfa4ebad90f565e86b2265455af41"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="/css/taResultcss.css" rel="stylesheet">
+<style>
+table {
+  background-color: transparent;
+  border-collapse: collapse !important;
+}
+</style>
+<div class="container">
+	<div class="page-header">
+		<h2>수익분석 보고서</h2>
+	</div>
+	<div class="row">
+		<h3>분석 설정 정보</h3>
+		<table class="table table-info">
+			<thead>
+				<tr>
+					<th>분석지역</th>
+					<th>기준업종</th>
+					<th>분석시점</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><%=request.getParameter("addr") %></td>
+					<td><%=request.getParameter("ujStr") %></td>
+					<td><fmt:formatDate pattern="yyyy-MM-dd" value="${an_dt }"/></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="row">
+		<h3>1.목표 매출 및 고객수</h3>
+		<table class="table table-info">
+			<thead>
+				<tr>
+					<th>월평균 목표매출</th>
+					<th>일평균 목표매출</th>
+					<th>일평균 목표 고객수</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="row">
+		<div class="resultwrap" >
+			<div class="col">
+				분석<br>
+				<strong>결과</strong>
+			</div>
+			<div class="col">
+				초기투자비와 월비용(고정·변동)을 고려했을 때, 적정한 월 매출수준은
+				<strong>${test }</strong>만원으로 분석됩니다. 
+				이는영업일 24일 기준으로는 일평균 <strong>값</strong> 만원 매출, <strong>값</strong> 명의 고객을 유치해야 가능한 수치입니다.  
+			</div>
+		</div>
+	</div>
+	<div class="row" style="padding-left: 220px;">
+		<div class="col-sm-9" style="text-align: center;" >
+			<p class="red"></p>
+			<form class="form-inline ng-pristine ng-valid" name="profitfrm" action="" method="post">
+				<table class="table table-bordered">
+					<colgroup>
+						<col style="width:85px">
+						<col style="width:150px">
+						<col style="width:65px">
+						<col style="width:150px">
+						<col>
+						<col>
+					</colgroup>
+					<thead>
+						<tr>
+							<th colspan="9">물건정보</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th>임대면적</th>
+							<td colspan="2">
+								<strong class=""></strong>
+								<label for="abda" class="sr-only">평</label>
+	                            <input id="PR_MJ" name="PR_MJ" class="form-control input-xxs onlyNumber ng-pristine ng-valid" type="text"
+	                            	maxlength="10" size="10" style="IME-MODE: disabled" placeholder="${profitVo.PR_MJ}"> 평 &nbsp;
+								<label for="abdb" class="sr-only"> 제곱미터</label>
+                           		<input id="pr_mj_auto" name="pr_mj_auto" class="form-control input-xxs ng-pristine ng-valid" type="text"
+                           			maxlength="10" size="10" disabled="disabled" readonly="readonly" style="text-align:right;"> 제곱미터
+							</td>
+							<th>실 면적</th>
+							<td colspan="2">
+								<strong class=""></strong>
+								<label for="abdc" class="sr-only">평</label>
+								<input id="PR_SMJ" name="PR_SMJ" class="form-control input-xxs onlyNumber ng-pristine ng-valid" type="text"
+									maxlength="10" size="10" style="text-align:right;" placeholder="${profitVo.PR_SMJ}"> 평 &nbsp;  
+								<label for="abdd" class="sr-only">제곱미터</label>
+								<input id="pr_smj_auto" name="pr_smj_auto" class="form-control input-xxs ng-pristine ng-valid" type="text"
+									maxlength="10" size="10" disabled="disabled" style="text-align:right;"> 제곱미터
+							</td>
+						</tr>
+						<tr class="thead">
+							<th colspan="6"> 초기 투자비용</th>
+						</tr>
+						<tr>
+							<th>권리금</th> 
+							<!-- pr_glpay -->
+							<td>
+								<label for="PR_GLPAY" class="sr-only">만원</label>
+                                <input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" id="PR_GLPAY" name="PR_GLPAY"
+                                	maxlength="10" size="10" onchange="getNumber(this);" style="text-align:right;" placeholder="${profitVo.PR_GLPAY}"> 만원
+							</td>
+							<th>보증금</th>
+							<!-- pr_bjpay -->
+							<td>
+								<label for="PR_BJPAY" class="sr-only">만원</label>
+								<input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10" id="PR_BJPAY"
+									name="PR_BJPAY" size="10" onchange="getNumber(this);" style="text-align:right;" placeholder="${profitVo.PR_BJPAY}"> 만원
+							</td>
+							<th>대출금/이자(연간)</th>
+							<!-- pr_am --> <!-- pr_ej -->
+							<td>
+								<label for="PR_AM" class="sr-only">만원</label>
+								<input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10" id="PR_AM" name="PR_AM"
+									size="10" style="text-align:right;" placeholder="${profitVo.PR_AM}"> 만원 &nbsp;
+								<label for="PR_EJ" class="sr-only">%</label>
+								<input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10" id="PR_EJ" name="PR_EJ"
+									size="10"  style="text-align:right;" placeholder="${profitVo.PR_EJ}"> % 
+							</td>
+						</tr>
+						<tr>
+							<th rowspan="3">기타 투자비</th>
+							<td colspan="5">
+								<label for="PR_BDPAY">건축비</label>
+								<!-- pr_bdpay -->
+                              		<input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+                              			id="PR_BDPAY" name="PR_BDPAY" size="10" onchange="getNumber(this);" style="text-align:right;"
+                              			placeholder="${profitVo.PR_BDPAY}"> 만원 &nbsp; &nbsp; &nbsp; &nbsp;										
+								<label for="PR_INTE">인테리어비</label>
+								<!-- pr_inte -->
+                              		<input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+                              			id="PR_INTE" name="PR_INTE" size="10"  onchange="getNumber(this);" style="text-align:right;"
+                              			placeholder="${profitVo.PR_INTE}"> 만원 &nbsp; &nbsp; &nbsp; &nbsp;										
+								<label for="PR_SBPAY">설비비</label>
+								<!-- pr_sbpay -->
+                                <input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+                                	id="PR_SBPAY" name="PR_SBPAY" size="10"  onchange="getNumber(this);" style="text-align:right;"
+                                	placeholder="${profitVo.PR_SBPAY}"> 만원 &nbsp; &nbsp; &nbsp; &nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td colspan="5">
+								<label for="PR_MEM">가맹관련</label>
+								<!-- pr_mem -->
+                                <input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+                                	id="PR_MEM" name="PR_MEM" size="10" onchange="getNumber(this);" style="text-align:right;"
+                                	placeholder="${profitVo.PR_MEM}"> 만원 &nbsp; &nbsp; &nbsp; &nbsp;
+								<label for="PR_OTPAY">기타비용</label>
+								<!-- pr_otpay -->
+									<input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+										id="PR_OTPAY" name="PR_OTPAY" size="10" onchange="getNumber(this);" style="text-align:right;"
+										placeholder="${profitVo.PR_OTPAY}"> 만원 &nbsp; &nbsp; &nbsp; &nbsp;										
+							</td>
+						</tr>
+						<tr>
+							<td colspan="5">
+								<h6>총 투자비, 감가상각 기간</h6>
+								<!-- allCost --> <!-- pr_peri -->
+								<p class="fr"><br>
+									<strong class=""></strong>
+									<label for="allCost" class="sr-only">총 투자비</label>
+									<input type="text" class="form-control input-xs input-required ng-pristine ng-valid" maxlength="10"
+										id="allCost" name="allCost" size="10" disabled="disabled" style="text-align:right;"> 만원 &nbsp; &nbsp;
+									<strong class=""></strong>
+									<label for="PR_PERI" class="sr-only">감가상각 기간</label>
+									<input type="text" class="form-control input-xxs onlyNumber ng-pristine ng-valid" maxlength="10"
+										id="PR_PERI" name="PR_PERI"  size="10" style="text-align:right;" placeholder="${profitVo.PR_PERI}"> 년
+								</p>
+								<p style="color: black;">※ 감가상각 기간은 인테리어나 설비, 집기 등 기간이 지날수록&nbsp;가치가 떨어져 <br>교체해야 하는 시기까지의 기간을 의미</p>
+							</td>
+						</tr>
+						<tr class="thead">
+							<th colspan="6">운영비용</th>
+						</tr>
+						<tr>
+							<th>월세</th>
+							<!-- pr_rtpay -->
+							<td colspan="2">
+								<label for="PR_RTPAY" class="sr-only">월세</label>
+								<input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+									id="PR_RTPAY" name="PR_RTPAY" data-ng-model="params.monRent" size="10" onchange="getNumber(this);"
+									style="text-align:right;" placeholder="${profitVo.PR_RTPAY}"> 만원 &nbsp;  
+							</td>
+							<th>인건비</th>
+							<!-- pr_ingun -->
+							<td colspan="2">
+								<label for="PR_INGUN" class="sr-only">인건비</label>
+                                <input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+                                	id="PR_INGUN" name="PR_INGUN" data-ng-model="params.laborCost" size="10" onchange="getNumber(this);"
+                                	style="text-align:right;" placeholder="${profitVo.PR_INGUN}"> 만원 &nbsp;										
+							</td>
+						</tr>
+						<tr>
+							<th>재료비</th>
+							<!-- pr_mtpay -->
+							<td colspan="2">
+								<label for="PR_MTPAY" class="sr-only">재료비</label>
+                              		<input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+                              			id="PR_MTPAY" name="PR_MTPAY" data-ng-model="params.materialCost" size="10" onchange="getNumber(this);"
+                              			style="text-align:right;" placeholder="${profitVo.PR_MTPAY}"> 만원 &nbsp;									  
+							</td>
+							<th>기타비용</th>
+							<!-- pr_oppay -->
+							<td colspan="2">
+								<label for="PR_OPPAY" class="sr-only">기타비용</label>
+								<input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+									id="PR_OPPAY" name="PR_OPPAY" data-ng-model="params.mngEtcCost" size="10" onchange="getNumber(this);"
+									style="text-align:right;" placeholder="${profitVo.PR_OPPAY}"> 만원 &nbsp;
+								<br>※ 음식/서비스업종은 재료비를 기타비용에 포함<br>(통계청 집계기준)
+							</td>
+						</tr>
+						<tr>
+							<th colspan="4">객 단가 &nbsp; <small>※ 1명의 고객이 1회 결제 시 이용하는 평균금액</small></th>
+							<!-- pr_avpay -->
+							<td colspan="2">
+								<strong class=""></strong>
+								<label for="PR_AVPAY" class="sr-only">객 단가</label>
+                                <input type="text" class="form-control input-xs onlyNumber ng-pristine ng-valid" maxlength="10"
+                                	id="PR_AVPAY" name="PR_AVPAY" size="10" onchange="getNumber(this);" style="text-align:right;"
+                                	placeholder="${profitVo.PR_AVPAY}"> 원 &nbsp;
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+	
+	</div>
+	<div class="row">
+		<h3>2.월 소요비용</h3>
+		<table class="table table-info">
+			<thead>
+				<tr>
+					<th colspan="2">월 고정비용</th>
+					<th colspan="2">월 변동비용</th>
+				</tr>
+			</thead>
+			<thead>
+				<tr>
+					<td>항목</td>
+					<td>월 비용</td>
+					<td>항목</td>
+					<td>월 비용</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>월세<br>(월 임차료+관리비+실비)</td>
+					<td>${profitVo.PR_RTPAY} 만원</td>
+					<td>재료비<br>(매출원가)</td>
+					<td>${profitVo.PR_MTPAY} 만원</td>
+				</tr>
+				<tr>
+					<td>고정인건비<br>(인건비의 70%로 계산)</td>
+					<td>${ingunfixing} 만원</td>
+					<td>변동인건비<br>(인건비의 30%로 계산)</td>
+					<td>${ingunVar } 만원</td>
+				</tr>
+				<tr>
+					<td>초기투자비용에 대한 월 발생비용<br>= 감가상각비 + 대출금의 이자 + 총투자비 2%<br>
+												* 감가상각에 보증금은 포함되지 않습니다</td>
+					<td>${monthPay } 만원</td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>기타비용<br>(복리후생비 + 수도광열비 + 세금과 공과비+ 접대비<br> + 소모품 + 마케팅비 + 교통비 + 통신비 + 지급수수료 등</td>
+					<td>${profitVo.PR_OPPAY} 만원</td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>소계</td>
+					<td>${total1 } 만원</td>
+					<td>소계</td>
+					<td>${total2 } 만원</td>
+				</tr>
+				<tr>
+					<td colspan="3">총 비용(고정비+변동비)</td>
+					<td>${allTotal } 만원</td>
+				</tr>
+				<tr>
+					<td colspan="2">※ 고정비용 : 판매량에 관계없이 월마다 꾸준히 지출되는 비용<br>
+									※ 인건비는 고정인건비(70%)와 변동인건비(30%)로 나누어 계산하였음<br>
+									※ 기타비용은 100% 고정비용으로 간주하여 계산하였음<br>
+									※ 음식/서비스업종은 재료비를 기타비용에 포함(통계청 집계기준)<br></td>
+					<td colspan="2">총 비용(고정비+변동비)※ 변동비용 : 판매량에 따라 월마다 달라지는 비용</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script>
+
+$(document).ready(function(){
+	$("total1").val("??");
+	
+});
+	
+	
+	
+</script>

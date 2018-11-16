@@ -1,0 +1,17 @@
+package kr.or.ddit.residential.service;
+
+import kr.or.ddit.residential.model.ResidentialVo;
+
+public interface ResidentialServiceInf {
+	/**
+	 * Method : getResidentialVo
+	 * 최초작성일 : 2018. 9. 14.
+	 * 작성자 : YSB
+	 * 변경이력 :
+	 * @param reg_code
+	 * @return
+	 * Method 설명 : 주거인구 가져오기
+	 */
+	ResidentialVo getResidentialVo(long reg_code);
+
+}

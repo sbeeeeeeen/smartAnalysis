@@ -1,0 +1,52 @@
+package kr.or.ddit.analysis_res.model;
+
+
+public class StoreVo {
+	/*private int[] storeCnt; //음식/생활서비스/소매/선택업종
+	private Map<String, Integer> IndustryCnt;*/
+	//대분류가 같은것중에 중분류 리스트
+	private String bizesNm; //상호명
+	private Double lon; //경도
+	private Double lat; //위도
+	private String indsMclsCd; //중분류 코드
+	private String indsMclsNm; //중분류 이름
+	private String lnoAdr; //주소
+	public String getBizesNm() {
+		return bizesNm;
+	}
+	public void setBizesNm(String bizesNm) {
+		this.bizesNm = bizesNm;
+	}
+	public Double getLon() {
+		return lon;
+	}
+	public void setLon(Double lon) {
+		this.lon = lon;
+	}
+	public Double getLat() {
+		return lat;
+	}
+	public void setLat(Double lat) {
+		this.lat = lat;
+	}
+	public String getIndsMclsCd() {
+		return indsMclsCd;
+	}
+	public void setIndsMclsCd(String indsMclsCd) {
+		this.indsMclsCd = indsMclsCd;
+	}
+	public String getIndsMclsNm() {
+		return indsMclsNm;
+	}
+	public void setIndsMclsNm(String indsMclsNm) {
+		this.indsMclsNm = indsMclsNm;
+	}
+	public String getLnoAdr() {
+		return lnoAdr;
+	}
+	public void setLnoAdr(String lnoAdr) {
+		this.lnoAdr = lnoAdr;
+	}
+	
+	
+}

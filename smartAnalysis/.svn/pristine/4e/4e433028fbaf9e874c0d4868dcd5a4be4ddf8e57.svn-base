@@ -1,0 +1,78 @@
+@CHARSET "EUC-KR";
+
+
+
+
+#topMenu li a, .dropbtn {
+    display: block;
+    padding: 20px 20px;
+    text-decoration: none;
+}
+
+#topMenu .dropbtn{
+	margin-right:15px;
+}
+
+#topMenu .topnav a:hover, .mydropdown:hover{
+    background-color:#68a4c4;
+    
+}
+
+#topMenu li.mydropdown {
+    display: inline-block;
+}
+
+#topMenu .mydropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 130px;
+    z-index: 1;
+    font-size: 13px;
+}
+
+
+
+#topMenu .mydropdown-content a {
+    color: black;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+
+
+#topMenu .mydropdown-content a:hover {
+	background-color: #f1f1f1
+	
+}
+
+
+#topMenu .mydropdown:hover .mydropdown-content {
+    display: block; 
+}
+
+
+#topMenu .topnav {
+    background-color: #2e2e2e; 
+    list-style-type: none;
+    text-align: center;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+#topMenu .topnav li {
+    display: inline-block;
+    font-size: 15px;
+    list-style-type: none;
+
+}
+
+#topMenu .topnav > li > a{
+	color:#ffffff;
+	text-decoration: none;
+	font-weight: bold;
+	margin-left: 15px;
+    margin-rigth: 15px;
+}

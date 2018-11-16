@@ -1,0 +1,5 @@
+package kr.or.ddit.pro.dao;
+
+public interface ProDaoInf {
+
+}

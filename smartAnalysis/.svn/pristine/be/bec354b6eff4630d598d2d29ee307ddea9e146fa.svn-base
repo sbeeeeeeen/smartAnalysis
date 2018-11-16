@@ -1,0 +1,86 @@
+package kr.or.ddit.a_main.web;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+import javax.websocket.EndpointConfig;
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import kr.or.ddit.member.model.MemberVo;
+
+@ServerEndpoint(value="/chat", configurator = GetHttpSessionForWebSocket.class)
+public class Broadsocket {
+	
+	private static Map<String, List<ClientVo>> clientMap = new HashMap<String, List<ClientVo>>();
+	private EndpointConfig config;
+	private Logger logger = LoggerFactory.getLogger(Broadsocket.class);
+	
+	{
+		if(clientMap.size()==0){
+			List<String> industryLList = new ArrayList<String>(
+					Arrays.asList("R", "P", "D", "Q", "N", "O", "L", "F"));
+			for(String industry : industryLList){
+				clientMap.put(industry, new ArrayList<ClientVo>());
+			}
+		}
+	}
+	
+	@OnOpen
+	public void onOpen(Session session, EndpointConfig config){
+		this.config=config;
+		HttpSession httpSession = (HttpSession)config.getUserProperties().get(HttpSession.class.getName());
+		String mem_id = ((MemberVo) httpSession.getAttribute("memberVo")).getMem_id();
+		logger.debug("mem_id={}", mem_id);
+		String ind_l = httpSession.getAttribute("ind_l").toString();
+		List<ClientVo> clientList = clientMap.get(ind_l);
+		for(ClientVo c : clientList){
+			if(c.getMem_id().equals(mem_id)){
+				return;
+			}
+		}
+		ClientVo client = new ClientVo();
+		client.setMem_id(mem_id);
+		client.setSession(session);
+		clientList.add(client);
+		clientMap.put(ind_l, clientList);
+	}
+	
+	@OnMessage
+	public void onMessage(String message, Session session) throws IOException {
+		logger.debug("message={}", message);
+		HttpSession httpSession = (HttpSession)config.getUserProperties().get(HttpSession.class.getName());
+		String mem_id = ((MemberVo) httpSession.getAttribute("memberVo")).getMem_id();
+		List<ClientVo> clientList = clientMap.get(httpSession.getAttribute("ind_l"));
+		for(ClientVo c : clientList){
+			if(!c.getMem_id().equals(mem_id)){
+				c.getSession().getBasicRemote().sendText(message);
+			}
+		}
+	}
+
+	@OnClose
+	public void onClose(Session session){
+		for(String key : clientMap.keySet()){
+			for(ClientVo c : clientMap.get(key)){
+				if(c.getSession().equals(session)){
+					clientMap.get(key).remove(c);
+					logger.debug("remove session {}", c.getMem_id());
+					return;
+				}
+			}
+		}
+	}
+
+}

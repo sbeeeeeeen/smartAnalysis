@@ -1,0 +1,48 @@
+package kr.or.ddit.guide.service;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import kr.or.ddit.guide.dao.GuideDaoInf;
+import kr.or.ddit.guide.model.GuideVo;
+
+import org.springframework.stereotype.Service;
+
+@Service("guideService")
+public class GuideService implements GuideServiceInf {
+
+	@Resource(name="guideDao")
+	private GuideDaoInf guideDao;
+
+	/**
+	 * 
+	 * Method : selectAllGuide
+	 * 최초작성일 : 2018. 8. 29.
+	 * 작성자 : PC23
+	 * 변경이력 :
+	 * @return
+	 * Method 설명 : 전체 가이드 정보 조회
+	 */
+	@Override
+	public List<GuideVo> selectAllGuide() {
+		return guideDao.selectAllGuide();
+	}
+
+	/**
+	 * 
+	 * Method : selectOneGuide
+	 * 최초작성일 : 2018. 8. 29.
+	 * 작성자 : PC23
+	 * 변경이력 :
+	 * @param gu_num
+	 * @return
+	 * Method 설명 : 가이드번호로 조회
+	 */
+	@Override
+	public GuideVo selectOneGuide(int gu_num) {
+		return guideDao.selectOneGuide(gu_num);
+	}
+	
+	
+}

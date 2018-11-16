@@ -1,0 +1,62 @@
+h3{
+	color: #68A4C4;
+	margin-bottom: 30px;
+	padding-top: 30px;
+}
+
+table{
+	border: 1px solid #f2f2f2;
+	border-collapse: collapse;
+}
+
+
+.table .table-info{
+	width:100%;
+}
+
+.table thead{
+	color: #ffffff;
+	background: #2e2e2e;
+}
+
+.table tbody{
+	color: #666666;
+	background: #ffffff;
+}
+
+
+.table thead tr th{
+	border-bottom: 0;
+	padding: 10px 8px;
+}
+
+.table tbody tr td{
+	padding: 15px 8px;
+}
+
+th, td{
+	text-align: center;
+	border: 1px solid #f2f2f2;
+	
+}
+.up{
+	color: #ff0000;
+}
+.down{
+	color: #0000fd;
+}
+
+.industryDiv{
+	height: 100%;
+	width: 580px;
+	float: left;
+}
+
+.helpwrap{
+	background: #f5f6f1;
+	margin-top: 10px;
+}
+
+.helpwrap ul{
+	max-width: 900px;
+}

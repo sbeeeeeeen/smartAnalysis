@@ -1,0 +1,14 @@
+package kr.or.ddit.consulting.web;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@RequestMapping(value="/consulting")
+@Controller(value="consultingController")
+public class ConsultingController {
+	
+	@RequestMapping(value="/request")
+	public String consulting(){
+		return "consulting";
+	}
+}

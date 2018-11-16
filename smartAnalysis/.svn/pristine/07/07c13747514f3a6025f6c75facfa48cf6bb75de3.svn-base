@@ -1,0 +1,54 @@
+package kr.or.ddit.copartnership.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import kr.or.ddit.copartnership.model.CopartnershipViewVo;
+import kr.or.ddit.copartnership.model.CopartnershipVo;
+
+@Repository("copartnershipDao")
+public class CopartnershipDao implements CopartnershipDaoInf {
+	
+	@Resource(name="sqlSessionTemplate")
+	SqlSessionTemplate template;
+	
+	@Override
+	public List<CopartnershipVo> allCopartnership() {
+		return template.selectList("copartnership.allCopartnership");
+	}
+
+	@Override
+	public List<CopartnershipVo> selectCopartnership(String search) {
+		return template.selectList("copartnership.selectCopartnership", search);
+	}
+
+	@Override
+	public List<CopartnershipViewVo> getCopartnershipPageList(Map<String, Object> map) {
+		return template.selectList("copartnership.getCopartnershipPageList",map);
+	}
+
+	@Override
+	public int getCopartnershipTotCnt(String search) {
+		return template.selectOne("copartnership.getCopartnershipTotCnt", search);
+	}
+
+	@Override
+	public CopartnershipVo getOneCopartnership(int id) {
+		return template.selectOne("copartnership.getOneCopartnership", id);
+	}
+
+	@Override
+	public int insertCopartnership(CopartnershipVo copartnershipVo) {
+		return template.insert("copartnership.insertCopartnership",copartnershipVo);
+	}
+
+	@Override
+	public List<CopartnershipVo> getJoinCopartnershipList(String mem_id) {
+		return template.selectList("copartnership.getJoinCopartnershipList", mem_id);
+	}
+}

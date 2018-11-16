@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="rating">
+	<select id="getdongRatingList" parameterType="int" resultType="ratingVo">
+		<![CDATA[
+		SELECT a.*
+		FROM(SELECT *
+			FROM rating
+			WHERE reg_code = (SELECT DISTINCT(reg_code)
+							  FROM analysis_code
+							  WHERE an_num=#{an_num})
+				  AND rt_month <= (SELECT DISTINCT(an_dt)
+				  				   FROM analysis_code
+				  				   WHERE an_num=#{an_num})
+			ORDER BY rt_month) a
+		WHERE rownum<7
+		]]>
+	</select>
+	
+	<select id="getguRatingList" parameterType="int" resultType="ratingVo">
+		<![CDATA[
+		SELECT a.*
+		FROM(SELECT AVG(rt_avg) AS rt_avg, rt_month
+			FROM rating
+			WHERE reg_code LIKE SUBSTR((SELECT DISTINCT(reg_code)
+										FROM analysis_code
+										WHERE an_num=#{an_num}), 1, 5)||'%'
+				  AND rt_month <= (SELECT DISTINCT(an_dt)
+				  				   FROM analysis_code
+				  				   WHERE an_num=#{an_num})
+			GROUP BY rt_month
+			ORDER BY rt_month) a
+		WHERE rownum<7
+		]]>
+	</select>
+	
+	<select id="getsiRatingList" parameterType="int" resultType="ratingVo">
+		<![CDATA[
+		SELECT a.*
+		FROM(SELECT AVG(rt_avg) AS rt_avg, rt_month
+			FROM rating
+			WHERE rt_month <= (SELECT DISTINCT(an_dt)
+				  				   FROM analysis_code
+				  				   WHERE an_num=#{an_num})
+			GROUP BY rt_month
+			ORDER BY rt_month) a
+		WHERE rownum<7
+		]]>
+	</select>
+	
+	
+</mapper>

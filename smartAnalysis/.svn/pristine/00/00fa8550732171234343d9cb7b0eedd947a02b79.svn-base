@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="analysis">
+	<select id="getAnalysisRes" parameterType="integer" resultType="analysisResVo">
+		SELECT *
+		FROM analysis_res
+		WHERE an_num = #{an_num}
+	</select>
+	
+	<select id="getAnalysisRec" parameterType="integer" resultType="analysisRecVo">
+		SELECT *
+		FROM analysis_rec
+		WHERE an_num = #{an_num}
+	</select>
+	
+	<select id="getAnalysisCode" parameterType="integer" resultType="analysisCodeVo">
+		SELECT *
+		FROM analysis_code
+		WHERE an_num = #{an_num}
+	</select>
+	
+	<select id="getAnalysisResList" parameterType="map" resultType="AnalysisTableVo">
+		SELECT an_num,
+		       (case(an_div)
+		       when '1' then '상권분석'
+		       when '2' then '입지분석'
+		       when '3' then '수익분석'
+		       when '4' then '미래지향분석' end) AS an_div,
+				(SELECT reg_si || ' ' || reg_gu || ' ' || reg_dong
+				 FROM region 
+				 WHERE reg_code=(SELECT DISTINCT(reg_code) 
+				 				FROM analysis_code 
+				 				WHERE an_num=res.an_num)) AS an_addr,
+       			(SELECT LISTAGG(<![CDATA[ind_l||' > '||ind_m||' > '||ind_s,'<br>']]>) WITHIN GROUP (ORDER BY ind_l)
+       			FROM industry
+        		WHERE ind_code IN(SELECT ind_code 
+        							FROM analysis_code 
+        							WHERE an_num=res.an_num)) AS an_industry,
+        		(SELECT DISTINCT(an_dt)
+        		FROM analysis_code
+        		WHERE an_num=res.an_num) AS an_dt
+		FROM (SELECT r.*, ROWNUM rn
+      		  FROM analysis_res r
+      		  WHERE mem_id=#{mem_id}
+      		  <if test="an_div!=0">AND an_div=#{an_div}</if>) res
+		WHERE rn BETWEEN (#{page}-1)*#{pageSize}+1 AND #{page}*#{pageSize}
+		ORDER by an_num DESC
+	</select>
+	
+	<select id="getAnalysisResCount" resultType="int" parameterType="map">
+		SELECT count(*)
+		FROM analysis_res
+		WHERE mem_id=#{mem_id} <if test="an_div!=0">AND an_div=#{an_div}</if>
+	</select>
+	
+	<insert id="insertAnalysisRes" parameterType="analysisResVo">
+		<selectKey keyProperty="an_num" resultType="int" order="AFTER">
+			SELECT SEQ_RES.CURRVAL FROM dual
+		</selectKey>
+		INSERT INTO analysis_res
+		VALUES (SEQ_RES.NEXTVAL
+				,#{mem_id}
+				,#{an_div}
+				)
+	</insert>
+	
+	<insert id="insertAnalysisCode" parameterType="map">
+		<selectKey keyProperty="reg_code" resultType="long" order="BEFORE">
+			SELECT reg_code
+			FROM region
+			WHERE reg_dong = #{dong}
+		</selectKey>
+		INSERT INTO analysis_code
+		VALUES (SEQ_CODE.NEXTVAL
+				,sysdate
+				,#{ind_code}
+				,#{reg_code}
+				,(SELECT ind_mcode
+				  FROM industry
+				  WHERE ind_code=#{ind_code})
+				,#{an_num}
+				)
+	</insert>
+	
+	<insert id="insertAnalysisRec" parameterType="analysisRecVo">
+		INSERT INTO analysis_rec
+		VALUES (SEQ_REC.NEXTVAL
+				,#{AN_COORX}
+				,#{AN_COORY}
+				,#{AN_SHAPE}
+				<choose>
+					<when test="AN_RAD!=0">
+					,#{AN_RAD}
+					</when>
+					<otherwise>
+					,null
+					</otherwise>
+				</choose>
+				,#{AN_NUM}
+				)
+	</insert>
+</mapper>

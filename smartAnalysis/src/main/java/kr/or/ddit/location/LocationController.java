@@ -1,0 +1,135 @@
+package kr.or.ddit.location;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
+import kr.or.ddit.analysis_res.model.AnalysisCodeVo;
+import kr.or.ddit.analysis_res.model.AnalysisRecVo;
+import kr.or.ddit.analysis_res.model.AnalysisResVo;
+import kr.or.ddit.analysis_res.service.AnalysisResServiceInf;
+import kr.or.ddit.floating.service.FloatingServiceInf;
+import kr.or.ddit.industry.service.IndustryServiceInf;
+import kr.or.ddit.member.model.MemberVo;
+import kr.or.ddit.rating.service.RatingServiceInf;
+import kr.or.ddit.rectal.service.RectalServiceInf;
+import kr.or.ddit.region.service.RegionServiceInf;
+import kr.or.ddit.residential.service.ResidentialServiceInf;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+@RequestMapping("location")
+@Controller("locationController")
+public class LocationController {
+	
+	@Resource(name="industryService")
+	private IndustryServiceInf industryService;
+	
+	@Resource(name="analysisResService")
+	private AnalysisResServiceInf analysisService;
+	
+	@Resource(name="ratingService")
+	private RatingServiceInf ratingService;
+	
+	@Resource(name="regionService")
+	private RegionServiceInf regionService;
+	
+	@Resource(name="floatingService")
+	private FloatingServiceInf floatingService;
+	
+	@Resource(name="rectalService")
+	private RectalServiceInf rectalService;
+	
+	@Resource(name="residentialService")
+	private ResidentialServiceInf residentialService;
+	
+	@Resource(name="openApi")
+	OpenApi api;
+	
+	@RequestMapping("selectLocation")
+	public String selectLocation(HttpSession session){
+		if(session.getAttribute("memberVo")==null){
+			return "login";
+		}
+		return "location";
+	}
+	
+	@RequestMapping("analysisLocation")
+	public String analysisLocation(@RequestParam("addr")String addr,
+								   @RequestParam("latlng")String[] latlng,
+								   HttpSession session,
+								   Model model
+								   ) throws UnsupportedEncodingException{
+		
+		//addr = new String(addr.getBytes("8859_1"),"UTF-8");
+		
+		AnalysisResVo anVo = new AnalysisResVo();
+		anVo.setAn_div('2');
+		anVo.setMem_id(((MemberVo)session.getAttribute("memberVo")).getMem_id());
+		
+		analysisService.insertAnalysisRes(anVo);
+		
+		AnalysisRecVo arVo = new AnalysisRecVo();
+		arVo.setAN_COORX(Double.parseDouble(latlng[1].replace(")", "")));
+		arVo.setAN_COORY(Double.parseDouble(latlng[0].replace("(", "")));
+		arVo.setAN_SHAPE('1');
+		arVo.setAN_NUM(anVo.getAn_num());
+		analysisService.insertAnalysisRec(arVo);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("dong", addr.split(" ")[2]);
+		data.put("an_num", anVo.getAn_num());
+		data.put("ind_code", "0");
+		
+		analysisService.insertAnalysisCode(data);
+		
+		model.addAttribute("analysisNum", anVo.getAn_num()); //----------------------------anVo.getAn_num() 바꿔야됨
+		return "locationResult";
+	}
+	
+	@RequestMapping("analysisData")
+	public ModelAndView analysisData(@RequestParam("analysisNum")int analysisNum){
+		ModelAndView mv = new ModelAndView("jsonView");
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("analysisRecVo", analysisService.getAnalysisRecList(analysisNum));
+		result.put("analysisResVo", analysisService.getAnalysisRes(analysisNum));
+		List<AnalysisCodeVo> analysisList = analysisService.getAnalysisCodeVo(analysisNum);
+		result.put("analysisList", analysisList);
+		
+		result.put("region", regionService.getRegion(analysisList.get(0).getREG_CODE()));
+		
+		result.put("floating", floatingService.getFloatingVo(analysisList.get(0).getREG_CODE()));
+		result.put("rectal", rectalService.getRectalVo(analysisList.get(0).getREG_CODE()));
+		result.put("residential", residentialService.getResidentialVo(analysisList.get(0).getREG_CODE()));
+		
+		System.out.println(analysisList.get(0).getREG_CODE());
+		Map<String, Object> industry = api.getXML(analysisList.get(0).getREG_CODE());
+		
+		
+		mv.addAllObjects(industry);
+		mv.addAllObjects(result);
+		
+		return mv;
+	}
+	
+	@RequestMapping("/relocation")
+	public String relocation(@RequestParam("an_num") int an_num, Model model){
+		model.addAttribute("analysisRec", analysisService.getAnalysisRecList(an_num).get(0));
+		return "location";
+	}
+	
+	@RequestMapping("/relocationReport")
+	public String relocationReport(@RequestParam("an_num") int an_num, Model model){
+		model.addAttribute("analysisNum", an_num);
+		return "locationResult";
+	}
+}

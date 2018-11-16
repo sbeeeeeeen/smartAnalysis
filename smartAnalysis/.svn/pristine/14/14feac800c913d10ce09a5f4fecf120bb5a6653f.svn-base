@@ -1,0 +1,32 @@
+package kr.or.ddit.guide.dao;
+
+import java.util.List;
+
+import kr.or.ddit.guide.model.GuideVo;
+
+public interface GuideDaoInf {
+	
+	/**
+	 * 
+	 * Method : selectAllGuide
+	 * 최초작성일 : 2018. 8. 29.
+	 * 작성자 : PC23
+	 * 변경이력 :
+	 * @return
+	 * Method 설명 : 전체 가이드 정보 조회
+	 */
+	List<GuideVo> selectAllGuide();
+	
+	/**
+	 * 
+	 * Method : selectOneGuide
+	 * 최초작성일 : 2018. 8. 29.
+	 * 작성자 : PC23
+	 * 변경이력 :
+	 * @param gu_num
+	 * @return
+	 * Method 설명 : 가이드번호로 조회
+	 */
+	GuideVo selectOneGuide(int gu_num);
+
+}

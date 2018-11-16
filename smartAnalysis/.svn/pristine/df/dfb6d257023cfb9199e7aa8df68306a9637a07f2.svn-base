@@ -1,0 +1,56 @@
+.selectwrap {
+	border-top: 1px solid #c9d0d6;
+	border-bottom: 1px solid #c9d0d6;
+	padding: 15px 0 10px 0;
+	text-align: center;
+	height: auto;
+	min-height: 60px;
+}
+
+.col-5, .col-4, .col-1 {
+	float: left;
+	position: relative;
+	min-height: 1px;
+}
+
+.col-5 {
+	width: 41.66666667%;
+}
+
+.col-4 {
+	width: 33.33333333%;
+}
+
+.col-1 {
+	width: 8.33333333%;
+}
+
+.col-offset-3 {
+	margin-left: 25%;
+}
+
+tr.detail {
+	display: none;
+	width: 100%;
+}
+
+tr.detail div {
+	display: none;
+}
+
+.showmore:hover {
+	cursor: pointer;
+}
+
+.selectwrap {
+	border-top: 1px solid #c9d0d6;
+	border-bottom: 1px solid #c9d0d6;
+	padding: 15px 0 10px 0;
+	text-align: center;
+	height: auto;
+	min-height: 60px;
+}
+
+#inviTable td {
+	word-break: break-all;
+}

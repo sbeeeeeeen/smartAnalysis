@@ -1,0 +1,135 @@
+package kr.or.ddit.consulting.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import kr.or.ddit.consulting.model.ConsultingVo;
+
+@Repository(value="consultingDao")
+public class ConsultingDao implements ConsultingDaoInf{
+
+	@Resource(name="sqlSessionTemplate")
+	private SqlSessionTemplate template;
+	
+	/**
+	* Method : insertConsulting
+	* 최초작성일 : 2018. 9. 13.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param consultingVo
+	* @return
+	* Method 설명 : 컨설팅 신청
+	*/
+	@Override
+	public int insertConsulting(ConsultingVo consultingVo) {
+		return template.insert("consulting.insertConsulting", consultingVo);
+	}
+
+	/**
+	* Method : cstNumConsulting
+	* 최초작성일 : 2018. 9. 14.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param cst_num
+	* @return
+	* Method 설명 : 일정번호에 맞는 컨설팅 조회(컨설턴트)
+	*/
+	@Override
+	public ConsultingVo cstNumConsulting(int cst_num) {
+		return template.selectOne("consulting.cstNumConsulting", cst_num);
+	}
+	
+	/**
+	* Method : cstNumMemberConsulting
+	* 최초작성일 : 2018. 9. 18.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param cst_num
+	* @return
+	* Method 설명 : 일정번호에 따른 게시글 조회(회원)
+	*/
+	@Override
+	public ConsultingVo cstNumMemberConsulting(int cst_num) {
+		return template.selectOne("consulting.cstNumMemberConsulting", cst_num);
+	}
+
+	/**
+	* Method : consultingPageList
+	* 최초작성일 : 2018. 9. 18.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param map
+	* @return
+	* Method 설명 : 컨설팅 페이징 처리(컨설턴트)
+	*/
+	@Override
+	public List<ConsultingVo> consultingPageList(Map<String, Object> map) {
+		return template.selectList("consulting.consultingPageList", map);
+	}
+	
+	/**
+	* Method : consultingMemberPageList
+	* 최초작성일 : 2018. 9. 18.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param map
+	* @return
+	* Method 설명 : 컨설팅 페이징 처리(회원)
+	*/
+	@Override
+	public List<ConsultingVo> consultingMemberPageList(Map<String, Object> map) {
+		return template.selectList("consulting.consultingMemberPageList", map);
+	}
+
+	@Override
+	public int consultingCnt() {
+		return template.selectOne("consulting.consultingCnt");
+	}
+
+	/**
+	* Method : consultingYN
+	* 최초작성일 : 2018. 9. 20.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param cst_num
+	* @return
+	* Method 설명 : 컨설팅 승인여부 업데이트
+	*/
+	@Override
+	public int consultingYN(int cst_num) {
+		return template.update("consulting.consultingYN", cst_num);
+	}
+
+	/**
+	* Method : consultingPayYN
+	* 최초작성일 : 2018. 9. 20.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param cst_num
+	* @return
+	* Method 설명 : 컨설팅 결제여부 업데이트
+	*/
+	@Override
+	public int consultingPayYN(int cst_num) {
+		return template.update("consulting.consultingPayYN",cst_num);
+	}
+
+	/**
+	* Method : deleteConsulting
+	* 최초작성일 : 2018. 9. 27.
+	* 작성자 : PC09
+	* 변경이력 :
+	* @param cst_num
+	* @return
+	* Method 설명 : 컨설팅 삭제
+	*/
+	@Override
+	public int deleteConsulting(int cst_num) {
+		return template.update("consulting.deleteConsulting", cst_num);
+	}
+}

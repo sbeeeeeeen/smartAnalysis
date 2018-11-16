@@ -1,0 +1,69 @@
+package kr.or.ddit.analysis_res.web;
+
+import java.io.IOException;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import kr.or.ddit.analysis_res.model.StoreVo;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+public class XmlParsing {
+	private DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
+	private final String KEY = "qFxwY7cE9FVYVQtzCgEJ0ZVpBB55tmobF4PsGSKvhvA5roJjnXiH%2FJ%2BLjDGjKVFMi%2BtmdAWW3TT1X4E6GYU2QA%3D%3D";
+	
+	//지역코드랑, 
+	public StoreVo getStoreCnt(Map<String, Object> data) throws ParserConfigurationException, SAXException, IOException{
+		return getMarkerCnt(data);
+	}
+	
+	private static String getTagValue(String tag, Element eElement) {
+	    NodeList nlList = eElement.getElementsByTagName(tag).item(0).getChildNodes();
+	    Node nValue = (Node) nlList.item(0);
+	    if(nValue == null) 
+	        return null;
+	    return nValue.getNodeValue();
+	}
+	
+	private StoreVo getMarkerCnt(Map<String, Object> data) throws ParserConfigurationException, SAXException, IOException{
+		//나중에 data에서 꺼내올거임
+		long reg_code = 3020054600L;
+		String divId = "adongCd";
+		
+		String url = "http://apis.data.go.kr/B553077/api/open/sdsc/storeListInDong?divId="+divId+"&key="+reg_code+"&ServiceKey="+KEY;
+		DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
+		dbFactoty = DocumentBuilderFactory.newInstance();
+		
+		Document doc = dBuilder.parse(url);
+
+		// root tag 
+		doc.getDocumentElement().normalize();
+		System.out.println("Root element: " + doc.getDocumentElement().getNodeName()); // Root element: result
+		
+		NodeList nList = doc.getElementsByTagName("item");
+		//System.out.println("파싱할 리스트 수 : "+ nList.getLength());
+		StoreVo storeVo = new StoreVo();
+		int d = 0; //소매
+		int f = 0; //생활서비스
+		int q = 0; //음식
+		
+		//D25A18
+		
+		for(int temp = 0; temp < nList.getLength(); temp++){
+			Node nNode = nList.item(temp);
+			if(nNode.getNodeType() == Node.ELEMENT_NODE){
+				Element eElement = (Element) nNode;
+				//System.out.println(eElement.getTextContent());
+				System.out.println("test : " + getTagValue("bizesNm", eElement));
+			}	// for end
+		}	// if end
+		return storeVo;
+	}
+}

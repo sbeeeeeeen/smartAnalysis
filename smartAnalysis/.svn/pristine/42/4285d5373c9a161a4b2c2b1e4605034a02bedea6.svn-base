@@ -1,0 +1,105 @@
+package kr.or.ddit.member.model;
+
+public class MemberVo {
+	
+	private String mem_id;				//아이디
+	private String ind_code;			//업종번호
+	private String mem_pass;			//비밀번호
+	private String mem_email;			//이메일
+	private String mem_name;			//이름
+	private String mem_call;			//휴대전화
+	private String mem_add;				//주소
+	private String mem_type;			//회원유형
+	private char mem_del;				//탈퇴여부
+	
+
+	
+	public String getMem_id() {
+		return mem_id;
+	}
+	public void setMem_id(String mem_id) {
+		this.mem_id = mem_id;
+	}
+	public String getInd_code() {
+		return ind_code;
+	}
+	public void setInd_code(String ind_code) {
+		this.ind_code = ind_code;
+	}
+	public String getMem_pass() {
+		return mem_pass;
+	}
+	public void setMem_pass(String mem_pass) {
+		this.mem_pass = mem_pass;
+	}
+	public String getMem_email() {
+		return mem_email;
+	}
+	public void setMem_email(String mem_email) {
+		this.mem_email = mem_email;
+	}
+	public String getMem_name() {
+		return mem_name;
+	}
+	public void setMem_name(String mem_name) {
+		this.mem_name = mem_name;
+	}
+	public String getMem_call() {
+		return mem_call;
+	}
+	public void setMem_call(String mem_call) {
+		this.mem_call = mem_call;
+	}
+	public String getMem_add() {
+		return mem_add;
+	}
+	public void setMem_add(String mem_add) {
+		this.mem_add = mem_add;
+	}
+	public String getMem_type() {
+		return mem_type;
+	}
+	public void setMem_type(String mem_type) {
+		this.mem_type = mem_type;
+	}
+	public char getMem_del() {
+		return mem_del;
+	}
+	public void setMem_del(char mem_del) {
+		this.mem_del = mem_del;
+	}
+	
+	
+	public boolean vaildateUser(String userId, String pass){
+		if(userId.equals(this.getMem_id()) && pass.equals(this.getMem_pass())){
+			return true;
+		}else
+			return false;
+		
+	}
+	
+	@Override
+	public String toString() {
+		return "MemberVo [mem_id=" + mem_id + ", ind_code=" + ind_code
+				+ ", mem_pass=" + mem_pass + ", mem_email=" + mem_email
+				+ ", mem_name=" + mem_name + ", mem_call=" + mem_call
+				+ ", mem_add=" + mem_add + ", mem_type=" + mem_type
+				+ ", mem_del=" + mem_del + "]";
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+}

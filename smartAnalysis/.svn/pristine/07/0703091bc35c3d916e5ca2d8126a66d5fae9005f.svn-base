@@ -1,0 +1,169 @@
+package kr.or.ddit.location;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import kr.or.ddit.analysis_res.model.AnalysisCodeVo;
+import kr.or.ddit.analysis_res.model.AnalysisRecVo;
+import kr.or.ddit.analysis_res.model.AnalysisResVo;
+import kr.or.ddit.analysis_res.service.AnalysisResServiceInf;
+import kr.or.ddit.floating.service.FloatingServiceInf;
+import kr.or.ddit.industry.model.IndustryVo;
+import kr.or.ddit.industry.service.IndustryServiceInf;
+import kr.or.ddit.member.model.MemberVo;
+import kr.or.ddit.rating.service.RatingServiceInf;
+import kr.or.ddit.rectal.service.RectalServiceInf;
+import kr.or.ddit.region.service.RegionServiceInf;
+import kr.or.ddit.residential.service.ResidentialServiceInf;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+@Service("openApi")
+public class OpenApi {
+	
+	@Resource(name="industryService")
+	IndustryServiceInf industryService;
+	
+	public Map<String, Object> getXML(long dong) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		int totalCnt = 0;
+		String ServiceKey = "yg%2BMKvCMzKzhnZeCQ257IJftDGzrbQ8qMQb15xQoih1kIuO%2B6TbAcGy7Nu8p6Mn1MajT2%2BsWLVUspk%2BWLgELgQ%3D%3D";
+		
+		String url = "http://apis.data.go.kr/B553077/api/open/sdsc/storeListInDong?"
+				+ "divId=adongCd"
+				+ "&key="+ dong
+				+ "&ServiceKey="+ServiceKey;
+		
+		List<locationIndustyVo> lVo = new ArrayList<locationIndustyVo>();
+		List<locationIndustyVo> qList = new ArrayList<locationIndustyVo>();
+		List<locationIndustyVo> fList = new ArrayList<locationIndustyVo>();
+		List<locationIndustyVo> dList = new ArrayList<locationIndustyVo>();
+		
+		List<IndustryVo> lList = industryService.getInd_L();
+		List<IndustryVo> QList = industryService.getIndustryM("Q");
+		List<IndustryVo> FList = industryService.getIndustryM("F");
+		List<IndustryVo> DList = industryService.getIndustryM("D");
+		
+		
+		for (int i = 0; i < lList.size(); i++) {
+			lVo.add(new locationIndustyVo());
+			lVo.get(i).setCode(lList.get(i).getIND_LCODE());
+			lVo.get(i).setName(lList.get(i).getIND_L());
+		}
+		setting(qList, QList, 'Q');
+		setting(fList, FList, 'F');
+		setting(dList, DList, 'D');
+		
+		try {
+			DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
+			Document doc = dBuilder.parse(url);
+			
+			doc.getDocumentElement().normalize();
+
+			NodeList nList = doc.getElementsByTagName("item");
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				Node nNode = nList.item(temp);
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement = (Element) nNode;
+					
+					xmlSetting(lVo, "indsLclsCd", eElement);
+					xmlSetting(qList, "indsMclsCd", eElement);
+					xmlSetting(fList, "indsMclsCd", eElement);
+					xmlSetting(dList, "indsMclsCd", eElement);
+					
+				} // for end
+			} // if end
+			
+			rankSetting(lVo);
+			rankSetting(qList);
+			rankSetting(fList);
+			rankSetting(dList);
+			totalCnt  = (int) (((totalCnt(qList) + totalCnt(fList) + totalCnt(dList))/3)+0.5f);
+			
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			e.printStackTrace();
+		}
+		result.put("qList", qList);
+		result.put("fList", fList);
+		result.put("dList", dList);
+		result.put("lVo", lVo);
+		result.put("totalCnt", totalCnt);
+		
+		return result;
+	}
+
+	private static String getTagValue(String tag, Element eElement) {
+		NodeList nlList = eElement.getElementsByTagName(tag).item(0)
+				.getChildNodes();
+		Node nValue = (Node) nlList.item(0);
+		if (nValue == null)
+			return null;
+		return nValue.getNodeValue();
+	}
+	private void setting(List<locationIndustyVo> list, List<IndustryVo> Llist, char type){
+		for (int i = 0; i < Llist.size(); i++) {
+			list.add(new locationIndustyVo());
+			list.get(i).setCode(Llist.get(i).getIND_MCODE());
+			list.get(i).setName(Llist.get(i).getIND_M());
+			list.get(i).setParentIndustry(type);
+		}
+	}
+	
+	private void xmlSetting(List<locationIndustyVo> list, String type, Element eElement){
+		for (int j = 0; j < list.size(); j++) {
+			if(getTagValue(type, eElement).equals(list.get(j).getCode())){
+				list.get(j).setCnt(list.get(j).getCnt()+1);
+				break;
+			}// if end
+		}// for end
+	}
+	
+	private void rankSetting(List<locationIndustyVo> list){
+		for (int i = 0; i < list.size(); i++) {
+			if(list.get(i).getCnt() < 1){
+				list.get(i).setRank("5");
+			}else if(list.get(i).getCnt() < 5){
+				list.get(i).setRank("4");
+			}else if(list.get(i).getCnt() < 8){
+				list.get(i).setRank("3");
+			}else if(list.get(i).getCnt() < 10){
+				list.get(i).setRank("2");
+			}else{
+				list.get(i).setRank("1");
+			}
+		}
+	}
+	
+	private float totalCnt(List<locationIndustyVo> list){
+		float total = 0;
+		for (int i = 0; i < list.size(); i++) {
+			total += Integer.parseInt(list.get(i).getRank());
+		}
+		return total/list.size();
+	}
+
+	
+	
+	
+}

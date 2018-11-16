@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="upfile">
+
+	<!-- 파일구분번호로 조회 -->
+	<select id="selectUpfile" resultType="upFileVo" parameterType="String">
+		select * from UPFILE where FILE_DIV = #{FILE_DIV}
+	</select>
+
+</mapper>

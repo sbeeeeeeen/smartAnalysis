@@ -1,0 +1,50 @@
+package kr.or.ddit.consulting.model;
+
+import java.util.Date;
+
+public class ConsultingVo {
+	private int cst_num;
+	private int pro_num;
+	private String mem_id;
+	private char cst_aprv;
+	private String cst_content;
+	private Date cst_dt;
+	
+	public int getCst_num() {
+		return cst_num;
+	}
+	public void setCst_num(int cst_num) {
+		this.cst_num = cst_num;
+	}
+	public int getPro_num() {
+		return pro_num;
+	}
+	public void setPro_num(int pro_num) {
+		this.pro_num = pro_num;
+	}
+	public String getMem_id() {
+		return mem_id;
+	}
+	public void setMem_id(String mem_id) {
+		this.mem_id = mem_id;
+	}
+	public char getCst_aprv() {
+		return cst_aprv;
+	}
+	public void setCst_aprv(char cst_aprv) {
+		this.cst_aprv = cst_aprv;
+	}
+	public String getCst_content() {
+		return cst_content;
+	}
+	public void setCst_content(String cst_content) {
+		this.cst_content = cst_content;
+	}
+	public Date getCst_dt() {
+		return cst_dt;
+	}
+	public void setCst_dt(Date cst_dt) {
+		this.cst_dt = cst_dt;
+	}
+	
+}

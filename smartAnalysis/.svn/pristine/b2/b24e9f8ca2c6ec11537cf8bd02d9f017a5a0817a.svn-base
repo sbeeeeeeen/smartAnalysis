@@ -1,0 +1,5 @@
+package kr.or.ddit.rectal.service;
+
+public interface RectalServiceInf {
+
+}

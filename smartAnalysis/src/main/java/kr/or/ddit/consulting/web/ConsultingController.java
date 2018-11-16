@@ -1,0 +1,358 @@
+package kr.or.ddit.consulting.web;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
+import kr.or.ddit.consulting.model.ConsultingVo;
+import kr.or.ddit.consulting.service.ConsultingServiceInf;
+import kr.or.ddit.member.model.MemberVo;
+import kr.or.ddit.member.service.MemberServiceInf;
+import kr.or.ddit.pro.model.ProVo;
+import kr.or.ddit.pro.service.ProServiceInf;
+import kr.or.ddit.schedule.model.ScheduleVo;
+import kr.or.ddit.schedule.service.ScheduleServiceInf;
+import net.nurigo.java_sdk.Coolsms;
+import net.nurigo.java_sdk.api.Message;
+import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import org.json.simple.JSONObject;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+@RequestMapping(value="/consulting")
+@Controller(value="consultingController")
+public class ConsultingController {
+	
+	@Resource(name="proService")
+	private ProServiceInf proService;
+	
+	@Resource(name="consultingService")
+	private ConsultingServiceInf consultingService;
+	
+	@Resource(name="scheduleService")
+	private ScheduleServiceInf scheduleService;
+	
+	@Resource(name="memberService")
+	private MemberServiceInf memberService;
+	
+	@RequestMapping(value="/request")
+	public String consulting(Model model){
+		List<ProVo> proList = proService.proList();
+		model.addAttribute("proList", proList);
+		
+		return "consulting";
+	}
+	
+	@RequestMapping(value="/submit")
+	@ResponseBody
+	public void consultintSubmit(
+									@RequestParam(value="pro_num")int pro_num
+									,@RequestParam(value="cst_content")String cst_content
+									,@RequestParam(value="cst_dt")Date cst_dt
+									,HttpSession session
+									,ConsultingVo consultingVo
+								) throws UnsupportedEncodingException{
+		
+		cst_content = URLDecoder.decode(cst_content, "UTF-8");
+		MemberVo memberVo = (MemberVo) session.getAttribute("memberVo");
+		String mem_id = memberVo.getMem_id();
+		
+		consultingVo.setPro_num(pro_num);
+		consultingVo.setMem_id(mem_id);
+		consultingVo.setCst_content(cst_content);
+		consultingVo.setCst_dt(cst_dt);
+		
+		consultingService.insertConsulting(consultingVo);
+	}
+	
+	@RequestMapping(value="/schedule")
+	public String scheduleManagement(
+										@RequestParam(value="page",defaultValue="1")int page
+										,@RequestParam(value="pageSize",defaultValue="10")int pageSize
+										,@RequestParam(value="cst_aprv",defaultValue="")String cst_aprv
+										,HttpSession session
+										,Model model
+									){
+		
+		MemberVo memberVo = (MemberVo) session.getAttribute("memberVo");
+		
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("cst_aprv", cst_aprv);
+		paramMap.put("mem_id", memberVo.getMem_id());
+		
+		Map<String, Object> resultMap = consultingService.consultingPageList(paramMap);
+		List<ConsultingVo> consultingList = (List<ConsultingVo>) resultMap.get("consultingPageList");
+		model.addAttribute("consultingList", consultingList);
+		
+		model.addAllAttributes(resultMap);
+		
+		return "scheduleManagement";
+	}
+	
+	@RequestMapping(value="/memberConsultingCheck")
+	public String myConsultingCheck(
+									@RequestParam(value="page",defaultValue="1")int page
+									,@RequestParam(value="pageSize",defaultValue="10")int pageSize
+									,@RequestParam(value="mem_id")String mem_id
+									,@RequestParam(value="cst_aprv",defaultValue="")String cst_aprv
+									,@RequestParam(value="channelId",defaultValue="")String channelId
+									,Model model
+								){
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("mem_id", mem_id);
+		paramMap.put("cst_aprv", cst_aprv);
+		
+		Map<String, Object> resultMap = consultingService.consultingMemberPageList(paramMap);
+		List<ConsultingVo> consultMemberList = (List<ConsultingVo>) resultMap.get("consultingMemberPageList");
+		
+		model.addAttribute("consultMemberList", consultMemberList);
+		
+		model.addAllAttributes(resultMap);
+		model.addAttribute("channelId", channelId);
+		
+		return "myConsultingCheck";
+	}
+	
+	@RequestMapping(value="/detail")
+	public String scheduleDetail(
+									@RequestParam(value="id")int cst_num
+									,Model model
+								){
+		ConsultingVo consultingVo = consultingService.cstNumConsulting(cst_num);
+		model.addAttribute("consultingVo", consultingVo);
+		return "scheduleManagementPost";
+	}
+	
+	@RequestMapping(value="/aprvYN")
+	@ResponseBody
+	public Map<String, Object> consultingYN(
+											@RequestParam(value="page",defaultValue="1")int page
+											,@RequestParam(value="pageSize",defaultValue="10")int pageSize
+											,@RequestParam(value="cst_aprv")String cst_aprv
+											,HttpSession session
+										){
+		
+		MemberVo memberVo = (MemberVo) session.getAttribute("memberVo");
+		
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("cst_aprv", cst_aprv);
+		paramMap.put("mem_id", memberVo.getMem_id());
+		
+		Map<String, Object> resultMap = consultingService.consultingPageList(paramMap);
+		
+		return resultMap;
+	}
+	
+	@RequestMapping(value="/aprvYNMember")
+	@ResponseBody
+	public Map<String, Object> ConsultingYNMember(
+			@RequestParam(value="page",defaultValue="1")int page
+			,@RequestParam(value="pageSize",defaultValue="10")int pageSize
+			,@RequestParam(value="cst_aprv")String cst_aprv
+			,HttpSession session
+			){
+		MemberVo memberVo = (MemberVo) session.getAttribute("memberVo");
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("page", page);
+		paramMap.put("pageSize", pageSize);
+		paramMap.put("cst_aprv", cst_aprv);
+		paramMap.put("mem_id", memberVo.getMem_id());
+		
+		Map<String, Object> resultMap = consultingService.consultingMemberPageList(paramMap);
+		
+		return resultMap;
+	}
+	
+	@RequestMapping(value="/yUpdate")
+	public String consultingY(@RequestParam(value="cst_num")int cst_num){
+		consultingService.consultingYN(cst_num);
+		return "redirect:/consulting/schedule";
+	}
+	
+	@RequestMapping(value="/deleteConsulting")
+	public String deleteConsulting(@RequestParam(value="cst_num")int cst_num){
+		consultingService.deleteConsulting(cst_num);
+		return "redirect:/consulting/schedule";
+	}
+	
+	
+	@RequestMapping(value="/myConsult")
+	public String myConsultSchedule(
+										HttpSession session
+										,Model model
+									){
+		MemberVo memberVo = (MemberVo) session.getAttribute("memberVo");
+		ProVo proVo = proService.proMember(memberVo.getMem_id());
+		
+		model.addAttribute("proVo", proVo);
+		
+		return "myConsultSchedule";
+	}
+	
+	
+	
+	@RequestMapping(value="/myConsultingDetail")
+	public String myConsultingDetail(
+										@RequestParam(value="id")int cst_num
+										,Model model
+									){
+		ConsultingVo consultingVo = consultingService.cstNumMemberConsulting(cst_num);
+		
+		model.addAttribute("consultingVo", consultingVo);
+		
+		return "myConsultingCheckDetail";
+	}
+	
+	@RequestMapping(value="/consultPayMent")
+	public String consultPayMent(
+									@RequestParam(value="pro_num")int pro_num
+									,@RequestParam(value="cst_num")int cst_num
+									,Model model
+								){
+		ProVo proVo = proService.proNumSelect(pro_num);
+		model.addAttribute("proVo", proVo);
+		model.addAttribute("cst_num", cst_num);
+		return "/consulting/payment";
+	}
+	
+//	@RequestMapping(value="/consultingPayYN")
+//	@ResponseBody
+//	public void consultingPayYN(@RequestParam(value="cst_num")int cst_num){
+//		consultingService.consultingPayYN(cst_num);
+//	}
+	
+	@RequestMapping(value="/consultingPayYN")
+	public ModelAndView consultingPayYN(@RequestParam(value="cst_num")int cst_num){
+		ModelAndView mv = new ModelAndView("jsonView");
+		consultingService.consultingPayYN(cst_num);
+		
+		return mv;
+	}
+	
+	@RequestMapping("/searchSchedule")
+	public ModelAndView searchSchedule(@RequestParam(value="pro_num")int pro_num,
+									   @RequestParam(value="scheduleID", defaultValue="0")int scheduleID){
+		if(scheduleID != 0){
+			int cnt = scheduleService.deleteSchedule(scheduleID);
+		}
+		
+		
+		ModelAndView mv = new ModelAndView("jsonView");
+		List<ScheduleVo> scheduleList = scheduleService.proNumSchedule(pro_num);
+		
+		mv.addObject("scheduleList", scheduleList);
+		
+		return mv;
+	}
+	
+	@RequestMapping("/insertSchedule")
+	public ModelAndView inputSchedule(ScheduleVo scheduleVo,
+									  @RequestParam(value="start")String start,
+									  @RequestParam(value="end")String end,
+									  HttpSession session) throws ParseException, UnsupportedEncodingException{
+		ModelAndView mv = new ModelAndView("jsonView");
+		MemberVo memberVo = (MemberVo) session.getAttribute("memberVo");
+		ProVo proVo = proService.proMember(memberVo.getMem_id());
+		
+		scheduleVo.setCpss_title(URLDecoder.decode(scheduleVo.getCpss_title(), "UTF-8"));
+		scheduleVo.setCpss_content(URLDecoder.decode(scheduleVo.getCpss_content(), "UTF-8"));
+		start = start.replace("\"", "");
+		end = end.replace("\"", "");
+		String[] start_split = start.split("T");
+		String[] end_split = end.split("T");
+		
+		String[] start_split1 = start_split[1].split("\\.");
+		String[] end_split1 = end_split[1].split("\\.");
+		
+		String start_dt = start_split[0] + " " + start_split1[0];
+		String end_dt = end_split[0] + " " + end_split1[0];
+		
+		Date sdt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(start_dt);
+		Date edt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(end_dt);
+		
+		scheduleVo.setCpss_Sdt(sdt);
+		scheduleVo.setCpss_Edt(edt);
+		scheduleVo.setPro_num(proVo.getPro_num());
+		
+		scheduleService.insertSchedule(scheduleVo);
+		mv.addObject(scheduleVo);
+		return mv;
+		
+	}
+	
+	@RequestMapping(value="/channelSubmit")
+	public ModelAndView channelSubmit(@RequestParam(value="channelId")String channelId
+									,@RequestParam(value="mem_call")String mem_call
+									,@RequestParam(value="consultMem_id")String consultMem_id
+									,HttpSession session
+								){
+		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("mem_chid", channelId);
+		map.put("mem_id", consultMem_id);
+		
+		consultingService.updateChannelId(map);
+		
+		ModelAndView mv = new ModelAndView("jsonView");
+		
+		String api_key = "NCSALF8JVO6NAZZ5";
+	    String api_secret = "YZH7ZYNVCBVNPEWFGLXSWM37L3RXDPRM";
+	    Message coolsms = new Message(api_key, api_secret);
+
+	    // 4 params(to, from, type, text) are mandatory. must be filled
+	    HashMap<String, String> params = new HashMap<String, String>();
+	    params.put("to", mem_call);		//수신자 번호
+	    params.put("from", "01074796181");		//발신자 번호(01030940050) -> 이것만 등록해서 이것만 가능
+	    params.put("type", "SMS");
+	    params.put("text", "컨설팅 채널ID는 "+channelId+" 입니다.");
+
+	    try {
+	      JSONObject obj = (JSONObject) coolsms.send(params);
+	      System.out.println(obj.toString());
+	    } catch (CoolsmsException e) {
+	      System.out.println(e.getMessage());
+	      System.out.println(e.getCode());
+	    } 
+	    mv.addObject("channelId", channelId);
+		return mv;
+	}
+	
+	@RequestMapping("/Rtctest")
+	public String rtcTest(
+							HttpSession session
+							,Model model
+							,@RequestParam(value="consultMemberId")String consultMemberId
+						){
+		MemberVo memberVo = memberService.getOneMember(consultMemberId);
+		String mem_call = memberVo.getMem_call();
+		String mem_id = ((MemberVo) session.getAttribute("memberVo")).getMem_id();
+		String mem_type = ((MemberVo) session.getAttribute("memberVo")).getMem_type();
+		String mem_chid = ((MemberVo) session.getAttribute("memberVo")).getMem_chid();
+		
+		model.addAttribute("consultMem_id", consultMemberId);
+		model.addAttribute("mem_call", mem_call);
+		model.addAttribute("mem_id", mem_id);
+		model.addAttribute("mem_type", mem_type);
+		model.addAttribute("mem_chid", mem_chid);
+		
+		return "snsAnalysis/testRTC";
+	}
+}

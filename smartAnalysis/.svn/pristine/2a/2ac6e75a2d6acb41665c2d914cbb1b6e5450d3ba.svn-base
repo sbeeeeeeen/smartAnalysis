@@ -1,0 +1,52 @@
+package kr.or.ddit.analysis_res.model;
+
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+public class AnalysisCodeVo {
+	private int AC_NUM;
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
+	private Date AN_DT;
+	private String IND_CODE;
+	private long REG_CODE;
+	private String IND_MCODE;
+	private int AN_NUM;
+	
+	public int getAC_NUM() {
+		return AC_NUM;
+	}
+	public void setAC_NUM(int aC_NUM) {
+		AC_NUM = aC_NUM;
+	}
+	public Date getAN_DT() {
+		return AN_DT;
+	}
+	public void setAN_DT(Date aN_DT) {
+		AN_DT = aN_DT;
+	}
+	public String getIND_CODE() {
+		return IND_CODE;
+	}
+	public void setIND_CODE(String iND_CODE) {
+		IND_CODE = iND_CODE;
+	}
+	public long getREG_CODE() {
+		return REG_CODE;
+	}
+	public void setREG_CODE(long rEG_CODE) {
+		REG_CODE = rEG_CODE;
+	}
+	public String getIND_MCODE() {
+		return IND_MCODE;
+	}
+	public void setIND_MCODE(String iND_MCODE) {
+		IND_MCODE = iND_MCODE;
+	}
+	public int getAN_NUM() {
+		return AN_NUM;
+	}
+	public void setAN_NUM(int aN_NUM) {
+		AN_NUM = aN_NUM;
+	}
+}

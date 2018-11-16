@@ -1,0 +1,37 @@
+package kr.or.ddit.a_main.web;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import kr.or.ddit.post.model.PostVo;
+import kr.or.ddit.post.service.PostServiceInf;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@RequestMapping("/main")
+@Controller("mainController")
+public class MainController {
+	
+	@Resource(name="postService")
+	private PostServiceInf postService;
+	
+	@RequestMapping("/view")
+	public String view(Model model){
+		List<PostVo> postList = postService.postList(1);
+		model.addAttribute("post5List", postList);
+		return "smartMain";
+	}
+	
+	@RequestMapping(value="/chat")
+	public String chat(){
+		return "chat/chat";
+	}
+	
+	@RequestMapping(value="/bot")
+	public String bot(){
+		return "chat/speech";
+	}
+}

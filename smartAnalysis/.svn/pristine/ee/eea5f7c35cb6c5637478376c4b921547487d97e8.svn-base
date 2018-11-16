@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="copartnership">
+  
+  	<select id="allCopartnership" resultType="copartnershipVo">
+  		select * from copartnership
+  	</select>
+  	
+  	<select id="selectCopartnership" resultType="copartnershipVo" parameterType="String">
+  		select *
+		  from copartnership
+		  where cship_name like '%' || #{search} || '%'
+  	</select>
+  	
+  	<select id="getCopartnershipPageList" resultType="CopartnershipViewVo" parameterType="map">
+		SELECT *
+		FROM (SELECT a.cship_num AS "cship_num", a.cship_name AS "cship_name", 
+			(SELECT ind_s FROM industry WHERE a.ind_code=industry.ind_code) AS "ind_s",
+			(SELECT COUNT(*) FROM cooperative WHERE cship_num=a.cship_num and (coop_div = '1' or coop_div= '2')) AS "cship_cnt", 
+			a.cship_dt AS "cship_dt",
+			(SELECT SUM(coop_div) FROM cooperative WHERE mem_id=#{mem_id} AND cship_num=a.cship_num) coop_div, 
+			a.cship_type cship_type,
+			a.cship_intro cship_intro, 
+			rownum rn
+			FROM(SELECT copartnership.*
+				FROM copartnership
+           		WHERE cship_name like '%' || #{search} || '%'
+				ORDER BY cship_dt DESC) a
+          			)
+		WHERE rn BETWEEN (#{page}-1)*#{pageSize}+1 AND #{page}*#{pageSize}
+	</select>
+	
+	<select id="getCopartnershipTotCnt" resultType="int" parameterType="String">
+		SELECT COUNT(*)
+			FROM copartnership
+			WHERE cship_name like '%' || #{search} || '%'
+	</select>
+  	
+  	<select id="getOneCopartnership" resultType="copartnershipVo" parameterType="int">
+		SELECT *
+			FROM COPARTNERSHIP
+			WHERE CSHIP_NUM = #{Id}
+  	</select>
+  	
+  	<insert id="insertCopartnership" parameterType="copartnershipVo">
+  	<selectKey keyProperty="cship_num" resultType="int" order="AFTER">
+			SELECT cship_num.CURRVAL FROM dual
+	</selectKey>
+ 		insert into copartnership(cship_num, ind_code, cship_name, cship_dt, cship_intro, cship_type) 
+ 		values (cship_num.nextval,#{ind_code},#{cship_name},sysdate,#{cship_intro},#{cship_type})
+  	</insert>
+  	
+  	<select id="getJoinCopartnershipList" parameterType="String" resultType="copartnershipVo">
+  		SELECT c.*, (SELECT SUM(coop_div) FROM cooperative WHERE mem_id=#{mem_id} AND c.cship_num=cship_num) coop_div
+  		FROM copartnership c
+  		WHERE cship_num IN(SELECT cship_num 
+  							FROM cooperative 
+  							WHERE mem_id=#{mem_id} AND coop_div IN(1,2))
+  		ORDER BY coop_div desc
+  	</select>
+  	
+  </mapper>

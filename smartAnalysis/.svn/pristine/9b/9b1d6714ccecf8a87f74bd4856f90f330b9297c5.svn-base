@@ -1,0 +1,91 @@
+package kr.or.ddit.analysis_res.web;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import kr.or.ddit.analysis_res.model.AnalysisCodeVo;
+import kr.or.ddit.analysis_res.model.StoreVo;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+public class XmlParsing {
+	private DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
+	private final String KEY = "qFxwY7cE9FVYVQtzCgEJ0ZVpBB55tmobF4PsGSKvhvA5roJjnXiH%2FJ%2BLjDGjKVFMi%2BtmdAWW3TT1X4E6GYU2QA%3D%3D";
+	
+	private static String getTagValue(String tag, Element eElement) {
+	    NodeList nlList = eElement.getElementsByTagName(tag).item(0).getChildNodes();
+	    Node nValue = (Node) nlList.item(0);
+	    if(nValue == null) 
+	        return null;
+	    return nValue.getNodeValue();
+	}
+	
+	//행정동에 해당하는 업소 개수
+	public Map<String, Object> getstoreListInUpjong(AnalysisCodeVo acVo) throws ParserConfigurationException, SAXException, IOException{
+		Map<String, Object> map = new HashMap<String, Object>();
+		long reg_code = acVo.getREG_CODE(); //지역코드(행정동)
+		String userIndsLclsCd = acVo.getIND_CODE().substring(0,1); //사용자가 고른거..대분류코드
+		String divId = "adongCd";
+		
+		String url = "http://apis.data.go.kr/B553077/api/open/sdsc/storeListInDong?divId="+divId+"&key="+reg_code+"&ServiceKey="+KEY;
+		DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
+		dbFactoty = DocumentBuilderFactory.newInstance();
+		
+		Document doc = dBuilder.parse(url);
+
+		// root tag 
+		doc.getDocumentElement().normalize();
+		System.out.println("Root element: " + doc.getDocumentElement().getNodeName()); // Root element: result
+		
+		NodeList nList = doc.getElementsByTagName("item");
+		//System.out.println("파싱할 리스트 수 : "+ nList.getLength());
+		int q = 0; //음식
+		int f = 0; //생활서비스
+		int d = 0; //소매
+		int u = 0;
+		List<StoreVo> storeList = new ArrayList<StoreVo>();
+		for(int temp = 0; temp < nList.getLength(); temp++){
+			Node nNode = nList.item(temp);
+			if(nNode.getNodeType() == Node.ELEMENT_NODE){
+				Element eElement = (Element) nNode;
+				String indsLclsCd = getTagValue("indsLclsCd", eElement);
+				if(indsLclsCd.equals("Q")) q++;
+				else if(indsLclsCd.equals("F")) f++;
+				else if(indsLclsCd.equals("D")) d++;
+				if(indsLclsCd.equals(userIndsLclsCd)){
+					u++;
+					StoreVo store = new StoreVo();
+					store.setBizesNm(getTagValue("bizesNm", eElement));
+					store.setIndsMclsCd(getTagValue("indsMclsCd", eElement));
+					store.setIndsMclsNm(getTagValue("indsMclsNm", eElement));
+					store.setLnoAdr(getTagValue("lnoAdr", eElement));
+					store.setLat(Double.parseDouble(getTagValue("lat", eElement)));
+					store.setLon(Double.parseDouble(getTagValue("lon", eElement)));
+					storeList.add(store);
+					System.out.println(store);
+				}
+			}	// if end
+		}	// for end
+		map.put("storeList", storeList);
+		List<Integer> getstoreListInUpjong = new ArrayList<Integer>();
+		getstoreListInUpjong.add(q+f+d+u);
+		getstoreListInUpjong.add(q);
+		getstoreListInUpjong.add(f);
+		getstoreListInUpjong.add(d);
+		getstoreListInUpjong.add(u);
+		map.put("getstoreListInUpjong", getstoreListInUpjong);
+		return map;
+	}
+	
+}

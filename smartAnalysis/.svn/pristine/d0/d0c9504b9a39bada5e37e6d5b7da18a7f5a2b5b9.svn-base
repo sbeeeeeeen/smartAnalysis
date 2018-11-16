@@ -1,0 +1,280 @@
+package kr.or.ddit.profit.web;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import javax.xml.parsers.ParserConfigurationException;
+
+import kr.or.ddit.analysis_res.model.AnalysisCodeVo;
+import kr.or.ddit.analysis_res.model.AnalysisRecVo;
+import kr.or.ddit.analysis_res.model.AnalysisResVo;
+import kr.or.ddit.analysis_res.service.AnalysisResServiceInf;
+import kr.or.ddit.future.web.XmlParsing2;
+import kr.or.ddit.industry.service.IndustryServiceInf;
+import kr.or.ddit.member.model.MemberVo;
+import kr.or.ddit.profit.model.ProfitVo;
+import kr.or.ddit.profit.service.ProfitServiceInf;
+import kr.or.ddit.region.service.RegionServiceInf;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.xml.sax.SAXException;
+
+
+@RequestMapping("/profit")
+@Controller
+public class ProfitController {
+	
+	@Resource(name="industryService")
+	private IndustryServiceInf industryService;
+	
+	@Resource(name="analysisResService")
+	private AnalysisResServiceInf analysisService;
+	
+	@Resource(name="regionService")
+	private RegionServiceInf regionService;
+	
+	@Resource(name="profitService")
+	private ProfitServiceInf profitService;
+	
+	XmlParsing2 xmlparser = new XmlParsing2();	//바로 api활용
+	
+	
+	@RequestMapping("/proSelect")
+	public String proSelect( Model model){
+		return "proSelect";
+	}
+	
+	@RequestMapping("/result")
+	public String proResult(@RequestParam("addr")String addr,
+							@RequestParam("ujcode")List<String> ujList,
+							@RequestParam("latlngJson")String latlng,
+							@RequestParam("btn")String btn,
+							@RequestParam(required=false, value="radius") String radius,
+							HttpSession session,
+							ProfitVo profitVo,
+							Model model){
+		String mem_id = ((MemberVo)session.getAttribute("memberVo")).getMem_id();
+		//analysis_res insert
+		AnalysisResVo anVo = new AnalysisResVo();
+		anVo.setAn_div('3');
+		anVo.setMem_id(mem_id);
+		int an_num = insertAnalysisRes(anVo);
+		
+		if(btn.equals("sendForm")){
+			//profit insert
+			profitVo.setAN_NUM(an_num);
+			profitService.insertProfit(profitVo);
+		}
+		
+		if(btn.equals("reFormBtn")){
+			profitVo.setAN_NUM(an_num);
+			profitService.insertProfit(profitVo);
+			
+		}
+		
+		//analysis_code insert
+		for(String industry : ujList){
+			Map<String, Object> data = new HashMap<String, Object>();
+			data.put("an_num", an_num);
+			data.put("ind_code", industry);
+			data.put("dong", addr.split(" ")[2]);
+			insertAnalysisCode(data);
+		}
+		
+		
+		//analysis_rec insert
+		JSONObject jsonobject = new JSONObject(latlng);
+		JSONArray jsonArray = jsonobject.getJSONArray("latlng");
+		for(int i=0; i<jsonArray.length(); i++){
+			AnalysisRecVo arVo = new AnalysisRecVo();
+			arVo.setAN_NUM(an_num);
+			arVo.setAN_SHAPE(jsonArray.length()==1?radius==null?'1':'2':'3');
+			arVo.setAN_RAD(radius==null?0:Double.parseDouble(radius));
+			arVo.setAN_COORX(jsonArray.getJSONObject(i).getDouble("lng"));
+			arVo.setAN_COORY(jsonArray.getJSONObject(i).getDouble("lat"));
+			insertAnalysisRec(arVo);
+		}
+		//[{"lng":127.41795816970264,"lat":36.325041518181216}]
+		String latlngStr = "{latlng: [{lng:"+jsonArray.getJSONObject(0).getDouble("lng")+", lat:"+jsonArray.getJSONObject(0).getDouble("lat")+"}]}";
+		
+		
+		
+		model.addAllAttributes(results(an_num));
+		model.addAttribute("profitVo", profitVo);
+		model.addAttribute("latlngJson", latlngStr);
+		return "proResult";
+	}
+	
+	//수익분석 보고서 가져갈 것들
+	public Map<String, Object> results(int an_num){
+		
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		
+		//ac_vo List
+		List<AnalysisCodeVo> acVoList = analysisService.getAnalysisCodeVo(an_num);
+		resultMap.put("acVoList", acVoList);
+//		long reg_code = acVoList.get(0).getREG_CODE();
+		
+		//분석시점
+		resultMap.put("an_dt", acVoList.get(0).getAN_DT());
+		
+		
+		//업종리스트
+		List<String> industryCodeList = new ArrayList<String>();
+		for(AnalysisCodeVo acVo : acVoList){
+			industryCodeList.add(acVo.getIND_CODE());
+		}
+		resultMap.put("industryList", industryService.getIndustryList(industryCodeList));
+		
+
+		ProfitVo profitVo = profitService.getProfit(an_num);
+		//고정인건비
+		int ingunfixing = (int) (profitVo.getPR_INGUN()*0.7);	
+		
+		//변동인건비
+		int ingunVar = (int) (profitVo.getPR_INGUN()*0.3);		
+		//초기 투자비용 
+		int allInvestCost = profitVo.getPR_BDPAY()+profitVo.getPR_INTE()
+							+profitVo.getPR_SBPAY()+profitVo.getPR_MEM()+profitVo.getPR_OTPAY();
+		//자동계산되는 값
+		int totalCost = allInvestCost+profitVo.getPR_GLPAY()+profitVo.getPR_BJPAY();
+		
+		//감가상각비
+		int pr_periPay = allInvestCost/(profitVo.getPR_PERI()*12);
+		
+		//대출금의 이자
+		int loan_interest = (int) ((profitVo.getPR_AM()*(profitVo.getPR_EJ()*0.01))/12);
+		
+		//초기 투자비용의 이자 2%
+		int allInvestCost_interest = (int) (allInvestCost*0.02);
+		
+		//초기 투자비용의 월 발생비용
+		int monthPay = pr_periPay+loan_interest+allInvestCost_interest;						
+		
+		//total1(월세+고정인건비+월 발생비용+기타비용):고정비
+		//total2(재료비+변동인건비):변동비
+		int total1 = profitVo.getPR_RTPAY()+ingunfixing+monthPay+profitVo.getPR_OPPAY();
+		int total2 = profitVo.getPR_MTPAY()+ingunVar;
+		//allTotal
+		int allTotal = total1+total2;
+		
+		//자본회수점 (월 목표 매출액) = 고정비/(1-변동비율) 3년기준
+		int monthSales = (int) (total1/(1-0.35));
+		//일평균 목표 매출 (24일 영업 기준)
+		int daySales = monthSales/24;
+		//일평균 목표 고객수
+		int dayCustomer = (daySales*10000)/(profitVo.getPR_AVPAY());
+		//세금
+		int tax = (int) (monthSales*0.07);
+		//월추정경상이익3년 (초기투자비용/36개월)
+		int monthlyProfit = totalCost/36;
+		
+		
+		//2년이내 회수 월목표매출
+		int monthSales_two = monthSales+monthlyProfit-tax;
+		//일평균 목표 매출
+		int daySales_two = monthSales_two/24;
+		//일평균 목표 고객수
+		int dayCustomer_two = (daySales_two*10000)/(profitVo.getPR_AVPAY());
+		//세금
+		int tax_two = (int) (monthSales_two*0.07);
+		//월추정경상이익2년 (초기투자비용/24개월)
+		int monthlyProfit_two = totalCost/24;
+		
+		
+		//손익분기점 월 목표매출
+		int profit_point = monthSales-monthlyProfit;
+		//일평균 목표매출
+		int daySales_point = profit_point/24;
+		//일평균 목표고객수
+		int dayCustomer_point = (daySales_point*10000)/(profitVo.getPR_AVPAY());
+		//세금
+		int tax_point = (int) (profit_point*0.07);
+		
+		
+		List<AnalysisRecVo> arVo = analysisService.getAnalysisRecList(an_num);
+		resultMap.put("analysisRecVo", arVo);
+		
+		//선택지역안에 업종개수
+		try {
+			resultMap.putAll(xmlparser.getstoreListInUpjong(acVoList, arVo));
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			System.out.println("----------"+xmlparser.getstoreListInUpjong(acVoList, arVo));
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+
+		resultMap.put("ingunfixing", ingunfixing);
+		resultMap.put("ingunVar", ingunVar);
+		resultMap.put("monthPay", monthPay);
+		resultMap.put("total1", total1);
+		resultMap.put("total2", total2);
+		resultMap.put("allTotal", allTotal);
+		resultMap.put("monthSales", monthSales);
+		resultMap.put("daySales", daySales);
+		resultMap.put("dayCustomer", dayCustomer);
+		resultMap.put("tax", tax);
+		resultMap.put("monthlyProfit", monthlyProfit);
+		resultMap.put("monthSales_two", monthSales_two);
+		resultMap.put("daySales_two", daySales_two);
+		resultMap.put("dayCustomer_two", dayCustomer_two);
+		resultMap.put("tax_two", tax_two);
+		resultMap.put("monthlyProfit_two", monthlyProfit_two);
+		resultMap.put("profit_point", profit_point);
+		resultMap.put("daySales_point", daySales_point);
+		resultMap.put("dayCustomer_point", dayCustomer_point);
+		resultMap.put("tax_point", tax_point);
+		return resultMap;
+	}
+	
+	//리턴값 : an_num
+	private int insertAnalysisRes(AnalysisResVo anVo){
+		return analysisService.insertAnalysisRes(anVo);
+	}
+	
+	//리턴값 : reg_code
+	private long insertAnalysisCode(Map<String, Object> data){
+		return analysisService.insertAnalysisCode(data);
+	}
+	
+	private int insertAnalysisRec(AnalysisRecVo arVo){
+		return analysisService.insertAnalysisRec(arVo);
+	}
+
+	@RequestMapping("/profitReport")
+	public String profitReport(@RequestParam("an_num") int an_num, @RequestParam("ujcode") List<String> ujcode, Model model){
+		model.addAllAttributes(results(an_num));
+		model.addAttribute("profitVo", profitService.getProfit(an_num));
+		AnalysisRecVo analysisRec = analysisService.getAnalysisRecList(an_num).get(0);
+		String latlngStr = "{latlng: [{lng:"+analysisRec.getAN_COORX()+", lat:"+analysisRec.getAN_COORY()+"}]}";
+		model.addAttribute("latlngJson", latlngStr);
+		return "proResult";
+	}
+	
+	@RequestMapping("/getujList")
+	public ModelAndView getujList(@RequestParam("an_num") int an_num){
+		ModelAndView mav = new ModelAndView("jsonView");
+		List<AnalysisCodeVo> analysisCode = analysisService.getAnalysisCodeVo(an_num);
+		List<String> ujList = new ArrayList<String>();
+		ujList.add(analysisCode.get(0).getIND_CODE());
+		mav.addObject("ujcode", ujList);
+		return mav;
+	}
+}

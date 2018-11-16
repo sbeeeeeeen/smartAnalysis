@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="board">
+  
+  <select id="getBoardnum" parameterType="int" resultType="int">
+  	select board_num
+  		from board
+  		where cship_num = #{id}
+  </select>
+  
+  <insert id="insertBoard" parameterType="boardVo">
+  	insert into board (board_num, cship_num, board_name) 
+  	values(board_num.nextval, #{cship_num}, #{board_name})
+  	
+  </insert>
+  
+  <select id="getBoard" parameterType="int" resultType="boardVo">
+  	select *
+  		from board
+  		where board_num = #{board_num}
+  </select>
+  
+  </mapper>

@@ -1,0 +1,91 @@
+package kr.or.ddit.analysis_res.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import kr.or.ddit.analysis_res.dao.AnalysisResDaoInf;
+import kr.or.ddit.analysis_res.model.AnalysisCodeVo;
+import kr.or.ddit.analysis_res.model.AnalysisRecVo;
+import kr.or.ddit.analysis_res.model.AnalysisResVo;
+
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class AnalysisResService implements AnalysisResServiceInf{
+	
+	@Resource
+	private AnalysisResDaoInf arDao;
+
+	@Override
+	public int insertAnalysisRes(AnalysisResVo anVo) {
+		return arDao.insertAnalysisRes(anVo);
+	}
+
+	@Override
+	public int insertAnalysisRec(AnalysisRecVo arVo) {
+		return arDao.insertAnalysisRec(arVo);
+	}
+
+	@Override
+	public long insertAnalysisCode(Map<String, Object> data) {
+		return arDao.insertAnalysisCode(data);
+	}
+
+	@Override
+	public Map<String, Object> getAnalysisVos(int an_num) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("anlaysisResVo", arDao.getAnalysisRes(an_num));
+		result.put("analysisRecVo", arDao.getAnalysisRec(an_num));
+		return result;
+	}
+	
+	@Override
+	public List<AnalysisCodeVo> getAnalysisCodeVo(int an_num) {
+		return arDao.getAnalysisCode(an_num);
+	}
+
+	@Override
+	public Map<String, Object> getAnalysisResList(Map<String, Object> data) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("pageList", arDao.getAnalysisResList(data));
+		int pageCnt = arDao.getAnalysisResCount(data);
+		data.put("pageCnt", pageCnt);
+		
+		Map<String, Object> NaviMap = makePageNavi(data);
+		resultMap.put("pageNavi", NaviMap.get("Navi").toString());
+		resultMap.put("size", pageCnt);
+		resultMap.put("pageSize", NaviMap.get("pageSize"));
+		resultMap.put("page", data.get("page"));
+		return resultMap;
+	}
+	
+	private Map<String, Object> makePageNavi(Map<String, Object> data){
+		int page = (int)data.get("page");
+		int pageSize = (int)data.get("pageSize");
+		int an_div = (int)data.get("an_div");
+		
+		StringBuffer result = new StringBuffer();
+		int count = 1;
+		int pageCnt = (int) data.get("pageCnt");
+		int temp = pageCnt;
+		result.append("<li "+(page==1?"class=\"disabled\" ><a href=\"#\">&laquo;</a></li>":"><a href=\"/analysisRes/tradeAnalysisRes?page="+(page-1)+"&pageSize="+pageSize+"&an_div="+an_div+"\">&laquo;</a></li>"));
+		while(temp>0){
+			temp-=pageSize;
+			result.append("<li "+(count==page?"class=\"active\"":"")+"><a href=\"/analysisRes/tradeAnalysisRes?page="+count+"&pageSize="+pageSize+"&an_div="+an_div+"\">"+count+++"</a></li>");
+			if(temp==pageSize)break;
+		};
+		result.append("<li "+(page==count-1?"class=\"disabled\"><a href=\"#\">&raquo;</a></li>":"><a href=\"/analysisRes/tradeAnalysisRes?page="+(count-1)+"&pageSize="+pageSize+"&an_div="+an_div+"\">&raquo;</a></li>"));
+		Map<String, Object> NaviMap = new HashMap<String, Object>();
+		NaviMap.put("Navi", result);
+		NaviMap.put("pageSize", count-1);
+		return NaviMap;
+	}
+
+	
+
+}
+
